@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+@theme {
+    --color-means-red: oklch(0.6565 0.2358 12.27);
+    --color-means-red-hover: oklch(0.6565 0.2358 12.27 / 76%);
+    --color-means-grey: oklch(0.8792 0 0);
+    --color-means-grey-hover: oklch(0.8792 0 0 / 76%);
+}
