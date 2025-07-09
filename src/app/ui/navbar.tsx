@@ -13,11 +13,11 @@ export default function Navbar() {
                 className={
                     clsx('w-full flex justify-start md:justify-center',
                     {
-                        'hover:text-means-red-hover text-means-red': pathname === '/',
-                        'hover:text-means-grey-hover': pathname !== '/'
+                        'hover:text-means-red-hover text-means-red': pathname === '/home',
+                        'hover:text-means-grey-hover': pathname !== '/home'
                     }
                 )}
-                href="/"
+                href="/home"
             >
                     Analytics
             </Link>
@@ -26,11 +26,11 @@ export default function Navbar() {
                 className={
                     clsx('w-full flex justify-start md:justify-center',
                     {
-                        'hover:text-means-red-hover text-means-red': pathname === '/payment-info',
-                        'hover:text-means-grey-hover': pathname !== '/payment-info'
+                        'hover:text-means-red-hover text-means-red': pathname === '/home/payment-info',
+                        'hover:text-means-grey-hover': pathname !== '/home/payment-info'
                     }
                 )}
-                href="/payment-info"
+                href="/home/payment-info"
             >
                 Payment Info
             </Link>
