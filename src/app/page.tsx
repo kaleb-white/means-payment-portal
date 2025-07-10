@@ -73,7 +73,7 @@ export default function Login() {
             <button className={clsx(' hover:bg-means-red-hover w-full font-bold text-xl p-2', {
               'bg-means-red': !signInPending,
               'bg-means-red-hover text-means-pending': signInPending
-            })} type="submit">LOG IN</button>
+            })} disabled={signInPending} type="submit">LOG IN</button>
 
           </div>
         </form>
@@ -123,8 +123,8 @@ export default function Login() {
 
             <button className={clsx(' hover:bg-means-red-hover w-full font-bold text-xl p-2', {
               'bg-means-red': !signUpPending,
-              'bg-means-red-hover text-means-pending': signUpPending
-            })} type="submit">SIGN UP</button>
+              'bg-means-red-hover text-means-pending': signUpPending || confirmPwd !== currentPwd
+            })} disabled={signUpPending || confirmPwd !== currentPwd} type="submit">SIGN UP</button>
 
           </div>
         </form>

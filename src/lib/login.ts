@@ -22,10 +22,28 @@ export async function signInSubmit(_previousState, formData: FormData) {
     const supabase = await supabaseClient()
     const { error } = await supabase.auth.signInWithPassword(data)
 
-    if (error) redirect('/')
+    if (error) {console.log(error);redirect('/')}
+    console.log("log in success")
     redirect('/home')
 }
 
 export async function signUpSubmit(_previousState, formData: FormData) {
+    // Validate Fields
+    const formEmail = formData.get("email"); const formPassword = formData.get("password");
+    const parseResult = signInSchema.safeParse({email: formEmail, password: formPassword})
+    if (!parseResult.success) {
+        return {
+            errors: parseResult.error.flatten().fieldErrors
+        }
+    }
 
+    // This is fine: https://zod.dev/basics?id=handling-errors
+    const data = parseResult.data as {email: string, password: string}
+
+    const supabase = await supabaseClient()
+    const { error } = await supabase.auth.signUp(data)
+
+    if (error) {console.log(error);redirect('/')}
+    console.log("sign up successs")
+    redirect('/home')
 }
