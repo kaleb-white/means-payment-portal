@@ -35,23 +35,3 @@ export async function supabaseClient() {
             },
         }
     )}
-
-export async function supabaseGetUser(email: string) {
-    const supabase = supabaseClient()
-    const { data, error } = await supabase.from('users').select('*') // eq('email', email).limit(1)
-    console.log("\nData received: ", JSON.stringify(data), "\n")
-    if (error) throw error
-    if (data.length === 0) return null
-    if (!data) return null
-    return data[0]
-}
-
-export async function supabaseGetSalt(email: string) {
-    const user = await supabaseGetUser(email)
-    return user.salt
-}
-
-export async function supabaseGetPasswordHash(email: string) {
-    const user = await supabaseGetUser(email)
-    return user.saltedHash
-}
