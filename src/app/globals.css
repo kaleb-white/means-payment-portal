@@ -5,6 +5,8 @@
     --color-means-red-hover: oklch(0.6565 0.2358 12.27 / 76%);
     --color-means-grey: oklch(0.8792 0 0);
     --color-means-grey-hover: oklch(0.8792 0 0 / 76%);
+    --color-means-red-error: oklch(63.7% 0.237 25.331);
+    --color-means-pending: oklch(70.7% 0.022 261.325);
 }
 
 @layer components {

@@ -20,7 +20,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           try {
             let user = null
 
-            const {email, password} = await signInSchema.parseAsync(credentials)
 
             // logic to salt and hash password
             const pwHash = await saltAndHashPassword(email, password)
