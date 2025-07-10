@@ -1,5 +1,6 @@
-import "./globals.css";
 import { inter } from '@/app/ui/fonts'
+
+import "./globals.css";
 
 export default function RootLayout({
   children,
@@ -12,7 +13,7 @@ export default function RootLayout({
         <title>Means Payment Portal</title>
       </head>
       <body
-        className={`${inter.className} antialiased`}
+        className={`${inter.className} antialiased bg-black text-white`}
       >
         {children}
       </body>

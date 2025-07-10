@@ -6,3 +6,11 @@
     --color-means-grey: oklch(0.8792 0 0);
     --color-means-grey-hover: oklch(0.8792 0 0 / 76%);
 }
+
+@layer components {
+    .means-border {
+        border-width: 0.8px;
+        border-color: gray;
+        border-radius: 4px;
+    }
+}
