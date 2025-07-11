@@ -33,5 +33,10 @@ export async function supabaseClient() {
                         }
                 },
             },
+            auth: {
+                persistSession: true,
+                autoRefreshToken: true,
+                detectSessionInUrl: true
+            }
         }
     )}

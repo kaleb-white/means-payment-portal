@@ -1,5 +1,6 @@
+import { debugLogger } from '@/lib/error'
 import { createServerClient } from '@supabase/ssr'
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
 // Reference and credit: https://supabase.com/docs/guides/auth/server-side/nextjs
 
@@ -39,12 +40,11 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  // If no user and request isn't coming from login page
   if (
     !user &&
-    !request.nextUrl.pathname.startsWith('/') &&
-    !request.nextUrl.pathname.startsWith('/auth')
+    !(request.nextUrl.pathname === '/')
   ) {
-    // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone()
     url.pathname = '/'
     return NextResponse.redirect(url)

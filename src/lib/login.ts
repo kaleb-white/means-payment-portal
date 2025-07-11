@@ -3,10 +3,10 @@
 import { signInSchema } from "./zod";
 
 import { redirect } from "next/navigation";
-import { supabaseClient } from "./supabase/supabase";
 
 import { treeifyError } from "zod";
 import { revalidatePath } from "next/cache";
+import { DatabaseContext } from "./services/database/database_context";
 
 // Reference docs: https://supabase.com/docs/guides/auth/server-side/nextjs?queryGroups=router&router=app
 
@@ -18,13 +18,12 @@ export async function signInSubmit(_previousState, formData: FormData) {
         return treeifyError(parseResult.error).properties
     }
 
-    // This is fine: https://zod.dev/basics?id=handling-errors
+    // This cast is fine: https://zod.dev/basics?id=handling-errors
     const data = parseResult.data as {email: string, password: string}
 
-    const supabase = await supabaseClient()
-    const { error } = await supabase.auth.signInWithPassword(data)
+    const error = await DatabaseContext().authService.signIn(data.email, data.password)
 
-    if (error) {revalidatePath('/'); redirect('/')}
+    if (error instanceof Error) {revalidatePath('/'); redirect('/')}
     redirect('/home')
 }
 
@@ -36,12 +35,12 @@ export async function signUpSubmit(_previousState, formData: FormData) {
         return treeifyError(parseResult.error).properties
     }
 
-    // This is fine: https://zod.dev/basics?id=handling-errors
+    // This cast is fine: https://zod.dev/basics?id=handling-errors
     const data = parseResult.data as {email: string, password: string}
 
-    const supabase = await supabaseClient()
-    const { error } = await supabase.auth.signUp(data)
+    const error = await DatabaseContext().authService.signUp(data.email, data.password)
 
-    if (error) {revalidatePath('/'); redirect('/')}
+    // TODO: Update these to return an error instead?
+    if (error instanceof Error) {revalidatePath('/'); redirect('/')}
     redirect('/home')
 }
