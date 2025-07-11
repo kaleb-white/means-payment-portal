@@ -1,4 +1,4 @@
-import { getUser } from "@/lib/user/user"
+import { getUser } from "@/lib/services/user"
 
 export default async function Analytics() {
 
