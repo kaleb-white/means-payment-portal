@@ -1,8 +1,8 @@
-import { getUser } from "@/lib/services/user"
+import { getCurrentUser } from "@/lib/services/user"
 
 export default async function Analytics() {
 
-    const user = await getUser()
+    const user = await getCurrentUser()
 
     return (
         <div className="flex flex-col">
