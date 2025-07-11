@@ -6,17 +6,26 @@ import { signInSubmit, signUpSubmit } from "@/lib/login";
 import { useActionState, useState } from "react";
 import clsx from "clsx";
 
+function Errors({fieldHasText, errors} : {fieldHasText: boolean | undefined, errors: string[] | undefined}){
+  return (
+    <>
+      {!fieldHasText? (errors? errors.map((error, idx) => {
+        return <p className="text-means-red-error text-sm" key={idx}>{error}</p>
+      }) : null ): null}
+    </>
+  )
+}
+
 export default function Login() {
   const [signInState, signInAction, signInPending] = useActionState(signInSubmit, null)
   const [signUpState, signUpAction, signUpPending] = useActionState(signUpSubmit, null)
 
-  // Output errors if fields are empty
-  const [emailEmpty, setEmailEmpty] = useState(true)
-  const [pwdEmpty, setPwdEmpty] = useState(true)
+  // Track field contents
+  const [currentPwd, setCurrentPwd] = useState("")
+  const [currentEmail, setCurrentEmail] = useState("")
 
   // Check if password matches confirmed password
   const [confirmPwd, setConfirmPwd] = useState("")
-  const [currentPwd, setCurrentPwd] = useState("")
 
   // Controller for sign in / sign up
   const [signIn, setSignIn] = useState(true)
@@ -32,11 +41,11 @@ export default function Login() {
         <div className="w-full flex flex-col mb-4 text-sm">
           <div className={clsx({'hidden': !signIn})}>
             <p className="inline-block mr-2">Sign in to the payment portal </p>
-            <p onClick={_ => {setSignIn(false); setEmailEmpty(false); setPwdEmpty(false);}} className="inline-block text-means-red cursor-pointer">No account? Sign up</p>
+            <p onClick={_ => {setSignIn(false); setCurrentEmail(""); setCurrentPwd("");}} className="inline-block text-means-red cursor-pointer">No account? Sign up</p>
           </div>
           <div className={clsx({'hidden': signIn})}>
             <p className="inline-block mr-2">Sign up for the payment portal </p>
-            <p onClick={_=> {setSignIn(true); setEmailEmpty(false); setPwdEmpty(false);}} className="inline-block text-means-red cursor-pointer">Have an account? Sign in</p>
+            <p onClick={_=> {setSignIn(true); setCurrentEmail(""); setCurrentPwd("");}} className="inline-block text-means-red cursor-pointer">Have an account? Sign in</p>
           </div>
         </div>
 
@@ -47,27 +56,23 @@ export default function Login() {
             <div className="w-full">
               <p className="text-sm mb-2">Email</p>
               <input
-                onChange={e => {
-                  if (e.target.value.length >= 1) setEmailEmpty(false)
-                  else setEmailEmpty (true)
-                }}
+                value={currentEmail}
+                onChange={e => setCurrentEmail(e.target.value)}
                 className="means-border p-3 w-full" type="text" name="email"
                 placeholder="currentlyseizing@means.tv"
               />
-              <p className="text-means-red-error">{emailEmpty? signInState?.errors.email : null}</p>
+              <Errors fieldHasText={currentEmail.length !== 0} errors={signInState?.email?.errors} />
             </div>
 
             <div>
               <p className="text-sm mb-2">Password</p>
               <input
-                onChange={e => {
-                  if (e.target.value.length >= 1) setPwdEmpty(false)
-                  else setPwdEmpty (true)
-                }}
+                value={currentPwd}
+                onChange={e => setCurrentPwd(e.target.value)}
                 className="means-border p-3 w-full" type="password" name="password"
                 placeholder="proletariandictator1234"
               />
-              <p className="text-means-red-error">{pwdEmpty? signInState?.errors.password : null}</p>
+              <Errors fieldHasText={currentPwd.length !== 0} errors={signInState?.password?.errors} />
             </div>
 
             <button className={clsx(' hover:bg-means-red-hover w-full font-bold text-xl p-2', {
@@ -85,28 +90,23 @@ export default function Login() {
             <div className="w-full">
               <p className="text-sm mb-2">Email</p>
               <input
-                onChange={e => {
-                  if (e.target.value.length >= 1) setEmailEmpty(false)
-                  else setEmailEmpty (true)
-                }}
+                value={currentEmail}
+                onChange={e => setCurrentEmail(e.target.value)}
                 className="means-border p-3 w-full" type="text" name="email"
                 placeholder="currentlyseizing@means.tv"
               />
-              <p className="text-means-red-error">{emailEmpty? signUpState?.errors.email : null}</p>
+              <Errors fieldHasText={currentEmail.length !== 0} errors={signUpState?.email?.errors} />
             </div>
 
             <div>
               <p className="text-sm mb-2">Password</p>
               <input
-                onChange={e => {
-                  setCurrentPwd(e.target.value)
-                  if (e.target.value.length >= 1) setPwdEmpty(false)
-                  else setPwdEmpty (true)
-                }}
+                value={currentPwd}
+                onChange={e => setCurrentPwd(e.target.value)}
                 className="means-border p-3 w-full" type="password" name="password"
                 placeholder="proletariandictator1234"
               />
-              <p className="text-means-red-error">{pwdEmpty? signUpState?.errors.password : null}</p>
+              <Errors fieldHasText={currentPwd.length !== 0} errors={signUpState?.password?.errors} />
             </div>
 
             <div>
@@ -118,7 +118,7 @@ export default function Login() {
                 className="means-border p-3 w-full" type="password"
                 placeholder="proletariandictator1234"
               />
-              <p className="text-means-red-error">{confirmPwd !== currentPwd ? "Passwords do not match" : null}</p>
+              <p className="text-means-red-error text-sm">{confirmPwd !== currentPwd ? "Passwords do not match" : null}</p>
             </div>
 
             <button className={clsx(' hover:bg-means-red-hover w-full font-bold text-xl p-2', {
