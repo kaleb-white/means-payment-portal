@@ -6,6 +6,8 @@ export default async function Analytics() {
 
     const analyticsData = await DatabaseContext().analyticsService.getUserQuarterlyReports(user, 2)
 
+    const currentData = await DatabaseContext().analyticsService.getUserInProgressReport(user)
+
     return (
         <div className="flex flex-col">
             {user?.email}

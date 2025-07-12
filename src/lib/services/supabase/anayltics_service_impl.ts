@@ -37,6 +37,7 @@ export class SupabaseAnayticsService implements AnalyticsServices {
         return filteredByCouponCode
     }
 
+    // Helper for getUserQuarterlyReports
     quartersToYearsAndQuarters(quarters: number) {
         let year = new Date().getFullYear()
         let quarter = Math.floor((new Date().getMonth() + 3) / 3) - 1 // Subtract 1 because current quarter still in progress
@@ -50,5 +51,18 @@ export class SupabaseAnayticsService implements AnalyticsServices {
             }
         }
         return returnArray
+    }
+
+    async getUserInProgressReport(user: User): Promise<ReportDataRow | Error> {
+        const supabase = await supabaseClient()
+
+        // Get user coupon code
+        const creatorCoupon = await DatabaseContext().userService.getUserCouponByUser(user)
+
+        // Fetch from DB
+        const { data, error } = await supabase.from('in_progress').select('*').eq("Coupon Code", creatorCoupon).limit(1)
+
+        if (error) return error
+        return data[0] as ReportDataRow
     }
 }

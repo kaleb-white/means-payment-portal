@@ -42,4 +42,5 @@ export interface AuthServices {
 
 export interface AnalyticsServices {
     getUserQuarterlyReports(user: User, quarters: number): Promise<ReportDataRow[] | Error>
+    getUserInProgressReport(user: User): Promise<ReportDataRow | Error>
 }
