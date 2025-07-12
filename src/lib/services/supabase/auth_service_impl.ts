@@ -1,4 +1,3 @@
-import { debugLogger } from "@/lib/error";
 import { User, AuthServices } from "../database/interfaces";
 import { supabaseClient } from "./supabase_client";
 
@@ -13,8 +12,10 @@ export class SupabaseAuthService implements AuthServices {
             if (error) return error
         }
 
+        // Sign up
         const { error } = await supabase.auth.signUp({email: email, password: password})
         if (error) return error
+
         return null
     }
 
@@ -28,6 +29,7 @@ export class SupabaseAuthService implements AuthServices {
             if (error) return error
         }
 
+        // Sign in
         const { error } = await supabase.auth.signInWithPassword({email: email, password: password})
         if (error) return error
         return null

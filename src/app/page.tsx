@@ -2,9 +2,10 @@
 
 import Image from "next/image";
 
-import { signInSubmit, signUpSubmit } from "@/lib/login";
+import { signInSubmit, signUpSubmit } from "@/lib/services/login/login";
 import { useActionState, useState } from "react";
 import clsx from "clsx";
+import { useSearchParams } from "next/navigation";
 
 function Errors({fieldHasText, errors} : {fieldHasText: boolean | undefined, errors: string[] | undefined}){
   return (
@@ -30,10 +31,20 @@ export default function Login() {
   // Controller for sign in / sign up
   const [signIn, setSignIn] = useState(true)
 
+  // Check for errors in search params, reference: https://nextjs.org/docs/app/api-reference/functions/use-search-params
+  const searchParams = useSearchParams()
+  const error = searchParams.get("error")
+
+
   return (
     <div className="flex flex-col place-content-center py-4 px-4 md:px-6">
 
       <Image src="/meanstv_logo.png" alt="Means TV" width={662} height={100} className="p-6 mx-auto"/>
+
+      <div className={clsx('w-full mb-4 mx-auto text-center text-sm overflow-clip text-means-red-error', {'hidden': !error})}>
+        Encountered an error: {error}. If the issue persists, please contact means.
+        Please sign in again.
+      </div>
 
       <div className="p-4 md:p-6 means-border rounded-sm md:rounded-lg w-full md:w-1/2 mx-auto">
 

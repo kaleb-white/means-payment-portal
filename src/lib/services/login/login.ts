@@ -1,16 +1,17 @@
 "use server"
 
-import { signInSchema } from "./zod";
+import { signInSchema } from "../../zod";
 
 import { redirect } from "next/navigation";
 
 import { treeifyError } from "zod";
 import { revalidatePath } from "next/cache";
-import { DatabaseContext } from "./services/database/database_context";
+import { DatabaseContext } from "../database/database_context";
 
 // Reference docs: https://supabase.com/docs/guides/auth/server-side/nextjs?queryGroups=router&router=app
 
 export async function signInSubmit(_previousState, formData: FormData) {
+
     // Validate Fields
     const formEmail = formData.get("email"); const formPassword = formData.get("password");
     const parseResult = signInSchema.safeParse({email: formEmail, password: formPassword})
@@ -21,9 +22,12 @@ export async function signInSubmit(_previousState, formData: FormData) {
     // This cast is fine: https://zod.dev/basics?id=handling-errors
     const data = parseResult.data as {email: string, password: string}
 
+    // Call context
     const error = await DatabaseContext().authService.signIn(data.email, data.password)
 
-    if (error instanceof Error) {revalidatePath('/'); redirect('/')}
+    // On error redirect with error message in url params
+    if (error instanceof Error) {revalidatePath('/'); redirect(`/?error=${error.message}`)}
+
     redirect('/home')
 }
 
@@ -38,9 +42,11 @@ export async function signUpSubmit(_previousState, formData: FormData) {
     // This cast is fine: https://zod.dev/basics?id=handling-errors
     const data = parseResult.data as {email: string, password: string}
 
+    // Call context
     const error = await DatabaseContext().authService.signUp(data.email, data.password)
 
-    // TODO: Update these to return an error instead?
-    if (error instanceof Error) {revalidatePath('/'); redirect('/')}
+    // On error redirect with error message in url params
+    if (error instanceof Error) {revalidatePath('/'); redirect(`/?error=${error.message}`)}
+
     redirect('/home')
 }

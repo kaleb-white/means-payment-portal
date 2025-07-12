@@ -21,7 +21,7 @@ export interface AuthServices {
     // Does not return the user because their session should be set going forward
     signIn(email: string, password: string): Promise<Error | null>
     signOut(): Promise<void>
-    getCurrentUser(): Promise<{user: User | null,  error: Error | null}>
+    getCurrentUser(): Promise<{user: User | null,  currentUserError: Error | null}>
 }
 
 export interface AnalyticsServices {

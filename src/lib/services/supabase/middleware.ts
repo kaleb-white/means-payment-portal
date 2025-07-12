@@ -1,4 +1,3 @@
-import { debugLogger } from '@/lib/error'
 import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -46,7 +45,7 @@ export async function updateSession(request: NextRequest) {
     !(request.nextUrl.pathname === '/')
   ) {
     const url = request.nextUrl.clone()
-    url.pathname = '/'
+    url.pathname = '/'; url.searchParams.set("error", "User not found while trying to access protected route")
     return NextResponse.redirect(url)
   }
 
