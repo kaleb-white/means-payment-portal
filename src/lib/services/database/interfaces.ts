@@ -21,7 +21,9 @@ export interface AuthServices {
     // Does not return the user because their session should be set going forward
     signIn(email: string, password: string): Promise<Error | null>
     signOut(): Promise<void>
-    getCurrentUser(): Promise<{user: User | null,  currentUserError: Error | null}>
+    // getCurrentUser should perform the same check as the middleware
+    // and redirect if no user is found or if an error is raised
+    getCurrentUser(): Promise<User>
 }
 
 export interface AnalyticsServices {
