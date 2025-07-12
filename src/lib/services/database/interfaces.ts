@@ -9,10 +9,24 @@ export interface User { // Modeled on (a partial of) supabase user obj: https://
     updated_at: string // Timestamps user was updated at
 }
 
+export interface ReportDataRow {
+    Period: string
+    Refunds: string
+    "Coupon Code": string
+    "Net Revenue": string
+    "Stripe Fees": string
+    "1/3 of Total": string
+    "Uscreen Fees": string
+    "Gross Revenue": string
+    "Number of Subscribers": number
+    "Total (Net Revenue - Refund)": string
+}
+
 export interface UserServices {
     getUserById(id: string): Promise<User | null>
     updateUser(id: string, updates: Partial<User>): Promise<User>
     deleteUser(id: string): Promise<void>
+    getUserCouponByUser(user: User): Promise<string | null>
 }
 
 export interface AuthServices {
@@ -27,5 +41,5 @@ export interface AuthServices {
 }
 
 export interface AnalyticsServices {
-    getUserQuarterlyReports(user: User, quarters: number): Promise<null>
+    getUserQuarterlyReports(user: User, quarters: number): Promise<ReportDataRow[] | Error>
 }

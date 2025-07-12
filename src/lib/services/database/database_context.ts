@@ -1,9 +1,11 @@
 import { SupabaseAnayticsService } from "../supabase/anayltics_service_impl";
 import { SupabaseAuthService } from "../supabase/auth_service_impl";
-import { AuthServices, AnalyticsServices } from "./interfaces";
+import SupabaseUserService from "../supabase/user_service_impl";
+import { AuthServices, AnalyticsServices, UserServices } from "./interfaces";
 
 let authService: AuthServices | null = null
 let analyticsService: AnalyticsServices | null = null
+let userService: UserServices | null = null
 
 export const DatabaseContext = () => {
     if (!authService) {
@@ -14,9 +16,14 @@ export const DatabaseContext = () => {
         analyticsService = new SupabaseAnayticsService()
     }
 
+    if (!userService) {
+        userService = new SupabaseUserService()
+    }
+
     return {
         authService,
-        analyticsService
+        analyticsService,
+        userService
     }
 
 }
