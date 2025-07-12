@@ -1,11 +1,13 @@
 "use server"
 
+import {baseUrls } from "@/lib/constants";
+
 import { signInSchema } from "../../zod";
+import { treeifyError } from "zod";
 
 import { redirect } from "next/navigation";
-
-import { treeifyError } from "zod";
 import { revalidatePath } from "next/cache";
+
 import { DatabaseContext } from "../database/database_context";
 
 // Reference docs: https://supabase.com/docs/guides/auth/server-side/nextjs?queryGroups=router&router=app
@@ -26,9 +28,9 @@ export async function signInSubmit(_previousState, formData: FormData) {
     const error = await DatabaseContext().authService.signIn(data.email, data.password)
 
     // On error redirect with error message in url params
-    if (error instanceof Error) {revalidatePath('/'); redirect(`/?error=${error.message}`)}
+    if (error instanceof Error) {revalidatePath(baseUrls.LOGIN); redirect(`${baseUrls.LOGIN}?error=${error.message}`)}
 
-    redirect('/home')
+    redirect(baseUrls.ANALYTICS)
 }
 
 export async function signUpSubmit(_previousState, formData: FormData) {
@@ -46,7 +48,7 @@ export async function signUpSubmit(_previousState, formData: FormData) {
     const error = await DatabaseContext().authService.signUp(data.email, data.password)
 
     // On error redirect with error message in url params
-    if (error instanceof Error) {revalidatePath('/'); redirect(`/?error=${error.message}`)}
+    if (error instanceof Error) {revalidatePath(baseUrls.LOGIN); redirect(`${baseUrls.LOGIN}?error=${error.message}`)}
 
-    redirect('/home')
+    redirect(baseUrls.ANALYTICS)
 }

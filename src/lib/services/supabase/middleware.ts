@@ -1,3 +1,4 @@
+import { baseUrls } from '@/lib/constants'
 import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -42,10 +43,10 @@ export async function updateSession(request: NextRequest) {
   // If no user and request isn't coming from login page
   if (
     !user &&
-    !(request.nextUrl.pathname === '/')
+    !(request.nextUrl.pathname === baseUrls.LOGIN)
   ) {
     const url = request.nextUrl.clone()
-    url.pathname = '/'; url.searchParams.set("error", "User not found while trying to access protected route")
+    url.pathname = baseUrls.LOGIN; url.searchParams.set("error", "User not found while trying to access protected route")
     return NextResponse.redirect(url)
   }
 

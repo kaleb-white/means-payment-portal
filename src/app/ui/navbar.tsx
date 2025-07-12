@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
+import { baseUrls } from '@/lib/constants'
 
 export default function Navbar() {
     const pathname = usePathname()
@@ -13,11 +14,11 @@ export default function Navbar() {
                 className={
                     clsx('w-full flex justify-start md:justify-center',
                     {
-                        'hover:text-means-red-hover text-means-red': pathname === '/home',
-                        'hover:text-means-grey-hover': pathname !== '/home'
+                        'hover:text-means-red-hover text-means-red': pathname === baseUrls.ANALYTICS,
+                        'hover:text-means-grey-hover': pathname !== baseUrls.ANALYTICS
                     }
                 )}
-                href="/home"
+                href={baseUrls.ANALYTICS}
             >
                     Analytics
             </Link>
@@ -26,11 +27,11 @@ export default function Navbar() {
                 className={
                     clsx('w-full flex justify-start md:justify-center',
                     {
-                        'hover:text-means-red-hover text-means-red': pathname === '/home/payment-info',
-                        'hover:text-means-grey-hover': pathname !== '/home/payment-info'
+                        'hover:text-means-red-hover text-means-red': pathname === baseUrls.PAYMENT_INFO,
+                        'hover:text-means-grey-hover': pathname !== baseUrls.PAYMENT_INFO
                     }
                 )}
-                href="/home/payment-info"
+                href={baseUrls.PAYMENT_INFO}
             >
                 Payment Info
             </Link>
