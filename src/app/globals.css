@@ -15,4 +15,10 @@
         border-color: gray;
         border-radius: 4px;
     }
+
+    .means-underline {
+        text-underline-offset: 0.5rem;
+        text-decoration-line: underline;
+        text-decoration-color: var(--color-means-red);
+    }
 }
