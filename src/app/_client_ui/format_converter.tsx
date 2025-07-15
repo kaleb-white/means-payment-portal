@@ -2,7 +2,8 @@ export function numberToFinancial(number: string): string {
     let o = ""
     for (let i = number.length - 4; i >= 0; i -= 3) {
         if (i === number.length - 4) {
-            o = o.replace(/^/, `,${number.slice(i - 2, i + 1)}.${number.slice(number.length - 2, number.length)}`)
+            const comma = i - 3 < 0 ? "" : ","
+            o = o.replace(/^/, `${comma}${number.slice(i - 2, i + 1)}.${number.slice(number.length - 2, number.length)}`)
         } else if (i - 3 < 0) {
             o = o.replace(/^/, number.slice(0, i + 1))
         } else {

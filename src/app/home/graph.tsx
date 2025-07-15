@@ -67,13 +67,8 @@ export default function Graph({
                 - width = x.bandwidth()
                 - height = innerHeight - y(d[property])
 
-                - textRectX = rectX + rectPadding
-                - textRectY = rectY + height - textHeight - rectPadding
-                - textWidth = x.bandwidth() / 4
-                - textHeight = height / 8
-
                 - textX = textRectX + textPadding
-                - textY = textRectY + textHeight - textPadding
+                - textY = textRectY + (does this bar reach the top of the svg? + 2 * textPadding : -textPadding)
                 */
                 // rect
                 const bar = enter.append("rect")
@@ -82,23 +77,6 @@ export default function Graph({
                     .attr("y", d => y(d[property]) - rectPadding)
                     .attr("width", x.bandwidth())
                     .attr("height", d => innerHeight - y(d[property]))
-                    .attr("rx", "8")
-
-                // textRect
-                enter.append("rect")
-                    .attr("class", "graph-text-rect")
-                    .attr("x",
-                        d => ((x(d.Period) ?? 0) + margin.left)
-                        + rectPadding
-                    )
-                    .attr("y",
-                        d => (y(d[property]) - rectPadding)
-                        + (innerHeight - y(d[property]))
-                        - ((innerHeight - y(d[property])) / 8)
-                        - rectPadding
-                    )
-                    .attr("width", x.bandwidth() / 4)
-                    .attr("height", d => (innerHeight - y(d[property])) / 8)
                     .attr("rx", "8")
 
                 // text
@@ -110,12 +88,9 @@ export default function Graph({
                         + textPadding
                     )
                     .attr("y",
-                        d => (y(d[property]) - rectPadding) + (innerHeight - y(d[property])) - ((innerHeight - y(d[property])) / 8) - rectPadding
-                        + ((innerHeight - y(d[property])) / 8)
-                        - textPadding
+                        d => y(d[property]) - rectPadding +
+                        (y(d[property]) - rectPadding <= 0? 2 * textPadding : (-textPadding))
                     )
-
-
                 return bar
             },
             update => update,
