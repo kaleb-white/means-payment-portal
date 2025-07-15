@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
-import { baseUrls } from '@/lib/constants'
+import { baseUrls } from '@/constants'
 
 export default function Navbar() {
     const pathname = usePathname()

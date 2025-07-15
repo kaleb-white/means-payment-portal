@@ -1,4 +1,4 @@
-import { baseUrls } from '@/lib/constants'
+import { baseUrls } from '@/constants'
 import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 

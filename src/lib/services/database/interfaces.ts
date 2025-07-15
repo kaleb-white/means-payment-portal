@@ -9,7 +9,7 @@ export interface User { // Modeled on (a partial of) supabase user obj: https://
     updated_at: string // Timestamps user was updated at
 }
 
-export interface ReportDataRow {
+export interface ReportDataRowUncast {
     Period: string
     Refunds: string
     "Coupon Code": string
@@ -20,6 +20,19 @@ export interface ReportDataRow {
     "Gross Revenue": string
     "Number of Subscribers": number
     "Total (Net Revenue - Refund)": string
+}
+
+export interface ReportDataRow {
+    Period: string
+    Refunds: number
+    "Coupon Code": string
+    "Net Revenue": number
+    "Stripe Fees": number
+    "1/3 of Total": number
+    "Uscreen Fees": number
+    "Gross Revenue": number
+    "Number of Subscribers": number
+    "Total (Net Revenue - Refund)": number
 }
 
 export interface UserServices {

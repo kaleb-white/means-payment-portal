@@ -1,4 +1,4 @@
-import { inter } from '@/app/ui/fonts'
+import { inter } from '@/app/_client_ui/fonts'
 
 import "./globals.css";
 

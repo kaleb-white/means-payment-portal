@@ -21,4 +21,21 @@
         text-decoration-line: underline;
         text-decoration-color: var(--color-means-red);
     }
+
+    /* Graph styles */
+    .graph-text-white {
+        font-family: Inter;
+        color: white;
+    }
+
+    .graph-text-rect {
+        fill: black;
+    }
+
+    .graph-text {
+        fill: white;
+        color: white;
+        font-family: Inter;
+        font-size: 10;
+    }
 }
