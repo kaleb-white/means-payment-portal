@@ -3,12 +3,13 @@ import AnalyticsContainer from "./anlytics_container"
 
 import { Suspense } from "react"
 import { AnalyticsLoading } from "../_client_ui/suspense"
+import { analyticsConfig } from "@/configs"
 
 export default async function Analytics() {
 
     const user = await DatabaseContext().authService.getCurrentUser()
 
-    const initialnAnalyticsData = DatabaseContext().analyticsService.getUserQuarterlyReports(user, 2)
+    const initialnAnalyticsData = DatabaseContext().analyticsService.getUserQuarterlyReports(user, analyticsConfig.defaultQuarters)
     const currentData = DatabaseContext().analyticsService.getUserInProgressReport(user)
 
     return (

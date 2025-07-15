@@ -1,5 +1,5 @@
 'use client'
-import { analyticsConfig } from "@/constants"
+import { analyticsConfig } from "@/configs"
 import { ReportDataRow } from "@/lib/services/database/interfaces"
 
 import { use, useState } from "react"

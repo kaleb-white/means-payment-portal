@@ -5,15 +5,9 @@ import { AnalyticsProperties } from "../_interfaces/types"
 
 import * as d3 from "d3"
 import { useEffect, useRef, useState } from "react"
-import { graphConfig } from "@/constants"
 import { numberToFinancial } from "../_client_ui/format_converter"
 
-function createDateFromPeriod(quarter: string) {
-    // Period / quarter format: yyyyQn, ie 2025Q1
-    // Date constructor accepts YYYY-MM as valid date: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date#date_time_string_format
-    const month = Number(quarter.slice(-1)) * 3
-    return new Date(`${quarter.slice(0, 4)}-${month < 10 ? `0${month}` : `${month}`}`)
-}
+
 
 // Reference:   https://2019.wattenberger.com/blog/react-and-d3
 //              https://observablehq.com/@d3/d3-scaletime
@@ -75,8 +69,8 @@ export default function Graph({
 
                 - textRectX = rectX + rectPadding
                 - textRectY = rectY + height - textHeight - rectPadding
-                - textWidth = x.bandwidth() / 8
-                - textHeight = height / 16
+                - textWidth = x.bandwidth() / 4
+                - textHeight = height / 8
 
                 - textX = textRectX + textPadding
                 - textY = textRectY + textHeight - textPadding

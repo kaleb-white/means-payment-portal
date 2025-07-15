@@ -22,9 +22,10 @@ export class SupabaseAnayticsService implements AnalyticsServices {
 
         // Run all promises
         const reports = (await Promise.all(reportsAwaitable))
-                        .filter(e => e?.data?.length !== 0) // Removes msising reports
+                        .filter(e => e?.data?.length !== 0) // Removes missing reports
 
         // Filter received reports by creator coupon code to create output reports only for creator with certain coupon code
+        // Second map statement converts from list of list of objs to list of objs
         const filteredByCouponCodeUncast = reports.map(report => {
             // Get report
             const reportData = report?.data?.at(0)?.report_data
@@ -35,7 +36,7 @@ export class SupabaseAnayticsService implements AnalyticsServices {
 
             // Add filtered report to mapped filtered reports
             return reportDataCast.filter(creatorQuarterInfo => creatorQuarterInfo["Coupon Code"] === creatorCoupon)
-        })[0]
+        }).map(r => r![0])
 
         if (!filteredByCouponCodeUncast ) return new Error("Fetching from database resulted in null.")
 

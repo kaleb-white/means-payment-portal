@@ -5,7 +5,7 @@ export enum baseUrls {
 }
 
 export enum analyticsConfig {
-    defaultQuarters=2,
+    defaultQuarters=4,
     defaultProperty="Total (Net Revenue - Refund)"
 }
 

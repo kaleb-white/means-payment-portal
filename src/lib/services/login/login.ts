@@ -1,6 +1,6 @@
 "use server"
 
-import {baseUrls } from "@/constants";
+import {baseUrls } from "@/configs";
 
 import { signInSchema } from "../../zod";
 import { treeifyError } from "zod";
