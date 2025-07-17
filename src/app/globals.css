@@ -12,7 +12,7 @@
 @layer components {
     .means-border {
         border-width: 0.8px;
-        border-color: gray;
+        border-color: rgb(77, 77, 77);
         border-radius: 4px;
     }
 

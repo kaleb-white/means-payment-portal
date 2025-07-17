@@ -1,4 +1,23 @@
+/**
+ * Converts a number in the format [0-9]*.[0-9]{2} to $([0-9]{3},)*.[0-9]{2}. (Regex not exact).
+ * If the number doesn't contain '.' in the last 3 positions, returns the string it was called with.
+ * Fault tolerant of numbers ending in .[0-9] or '.'.
+ * @param number - A number in the format, for example, 1234.00.
+ * @returns - A number in the format, for example, $1,234.00.
+*/
 export function numberToFinancial(number: string): string {
+    const last3 = number.slice(number.length - 3)
+
+    if (!last3.includes('.')) {
+        return number
+    }
+
+    if (last3[1] === '.') {
+        number = number.replace(/$/, '0')
+    } else if (last3[2] === '.') {
+        number = number.replace(/$/, '00')
+    }
+
     let o = ""
     for (let i = number.length - 4; i >= 0; i -= 3) {
         if (i === number.length - 4) {
