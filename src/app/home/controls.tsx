@@ -16,6 +16,7 @@ export default function Controls({
     quartersPrevious: number
 }) {
     const [menuShowing, setShowing] = useState(false)
+    const [testQuarters, setQuarters] = useState(4)
 
     return (
         <div className="flex flex-col mt-2 gap-2 text-xs md:text-lg">
@@ -29,7 +30,7 @@ export default function Controls({
                         "transition-all duration-300 ease-out",
                         "text-white text-2xs md:text-sm absolute means-border bg-black flex flex-col gap-0.5",
                         {
-                            "scale-95 opacity-0": !menuShowing,
+                            "scale-95 opacity-0 hidden": !menuShowing,
                             "scale-100 opacity-100": menuShowing
                         })}
                     >
@@ -47,9 +48,17 @@ export default function Controls({
             </div>
 
             {/* Number of quarters to display controls */}
-            <div className="flex flex-row gap-5">
+            <div className="flex flex-row gap-5 text-white">
                 <div className="text-means-red">QUARTERS</div>
-                <div></div>
+                <div className="flex flex-row gap-3">
+                    <div className="means-border px-1" onClick={_ => setQuartersPrevious(quartersPrevious - 1)}>－</div>
+                    <input
+                        onChange={e => setQuartersPrevious(Number(e.target.value))}
+                        className="means-border bg-means-grey w-8 text-center text-black"
+                        value={quartersPrevious}
+                    />
+                    <div className="means-border px-1" onClick={_ => setQuartersPrevious(quartersPrevious + 1)}>＋</div>
+                </div>
             </div>
         </div>
     )
