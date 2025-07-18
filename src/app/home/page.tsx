@@ -6,11 +6,11 @@ import { AnalyticsLoading } from "../_client_ui/suspense"
 import { analyticsConfig } from "@/configs"
 
 export default async function Analytics() {
+    const dbContext = await DatabaseContext()
+    const user = await dbContext.authService.getCurrentUser()
 
-    const user = await (await DatabaseContext()).authService.getCurrentUser()
-
-    const initialnAnalyticsData = (await DatabaseContext()).analyticsService.getUserQuarterlyReports(user, analyticsConfig.defaultQuarters)
-    const currentData = (await DatabaseContext()).analyticsService.getUserInProgressReport(user)
+    const initialnAnalyticsData = dbContext.analyticsService.getUserQuarterlyReports(analyticsConfig.defaultQuarters, user)
+    const currentData = dbContext.analyticsService.getUserInProgressReport(user)
 
     return (
         <div className="flex flex-row justify-center gap-2 md:gap-4">

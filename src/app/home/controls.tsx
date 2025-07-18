@@ -8,12 +8,14 @@ export default function Controls({
     setGraphProperty,
     setQuartersPrevious,
     graphProperty,
-    quartersPrevious
+    quartersPrevious,
+    changePending
 }: {
     setGraphProperty: Dispatch<SetStateAction<AnalyticsProperties>>,
     setQuartersPrevious: Dispatch<SetStateAction<number>>,
     graphProperty: AnalyticsProperties,
-    quartersPrevious: number
+    quartersPrevious: number,
+    changePending: boolean
 }) {
     const [menuShowing, setShowing] = useState(false)
 
@@ -58,6 +60,7 @@ export default function Controls({
                     />
                     <div className="means-border px-1" onClick={_ => setQuartersPrevious(quartersPrevious + 1)}>＋</div>
                 </div>
+                {changePending? <div className="flex items-center"><div className="animate-spin border-means-red size-5 rounded-full border-4 border-t-transparent"></div></div> : <></>}
             </div>
         </div>
     )

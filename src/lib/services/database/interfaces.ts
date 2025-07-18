@@ -35,6 +35,7 @@ export interface ReportDataRow {
     "Total (Net Revenue - Refund)": number
 }
 
+// Has corresponding Zod schema
 export interface DateInYearQuarter {
     year: string,
     quarter: string
@@ -99,11 +100,11 @@ export interface AnalyticsServices {
      * Concurrently fetches all reports from the database excluding the current report.
      * Implementation removes reports that don't exist or contain no reportData (which is stored as a JSONB field).
      * Implementation filters the JSONB data to remove all data not corresponding to the current user's coupon code.
-     * @param user - The user returned by getCurrentUser.
+     * @param user - The user returned by getCurrentUser. If no user is passed, user taken from session.
      * @param quarters - Either a number of quarters starting from the current quarter and counting backwards or an array of DateInYearQuarter objects.
      * @returns Either an array of reports or an Error.
      */
-    getUserQuarterlyReports(user: User, quarters: number | DateInYearQuarter[]): Promise<ReportDataRow[] | Error>
+    getUserQuarterlyReports(quarters: number | DateInYearQuarter[], user?: User): Promise<ReportDataRow[] | Error>
     /**
      * Gets the in progress report, which is stored in its' own table.
      * @param user - The user returned by getCurrentUser.

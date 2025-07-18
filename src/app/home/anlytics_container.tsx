@@ -2,11 +2,12 @@
 import { analyticsConfig } from "@/configs"
 import { ReportDataRow } from "@/lib/services/database/interfaces"
 
-import { use, useEffect, useState } from "react"
-import Graph from "./graph"
 import { AnalyticsProperties } from "../_interfaces/types"
+import Graph from "./graph"
 import Controls from "./controls"
-import { DatabaseContext } from "@/lib/services/database/database_context"
+
+import { startTransition, use, useActionState, useEffect, useRef, useState } from "react"
+import { quartersToYearsAndQuarters } from "@/format_converter"
 
 export default function AnalyticsContainer({
     initialDataStream,
@@ -30,14 +31,36 @@ export default function AnalyticsContainer({
         new Error("Report data failed to load.")
     )
 
-    // Update graph data on change to quartersPrevious
-    useEffect (() => {
-        async function fetchQuarterlyReports() {
-            
-        }
+    // Fetch new report data
+    const preventInitial = useRef(true)
+    const [_, action, pending] = useActionState(
+        async () => {
+            const quartersConverted = quartersToYearsAndQuarters(quartersPrevious)
+            const response = await fetch('api/get-quarterly-reports', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(quartersConverted)
+            })
+            if (response.status !== 200) {
+                return // TODO
+            }
+            const r = await response.json() as Array<ReportDataRow>
+            if (!(initialCurrentData instanceof Error)) {
+                r.push(initialCurrentData)
+            }
+            setReportData(r)
+        },
+        null
+    )
 
-        fetchQuarterlyReports()
-    }, [quartersPrevious])
+    useEffect (() => {
+        if (preventInitial.current) {preventInitial.current = false; return}
+        async function transitionReportData() {startTransition(action)}
+        transitionReportData()
+    }, [quartersPrevious, action])
 
 
     if (reportData instanceof Error) {
@@ -50,7 +73,7 @@ export default function AnalyticsContainer({
                 </div>
                 <Controls
                     setGraphProperty={setGraphProperty} setQuartersPrevious={setQuartersPrevious}
-                    graphProperty={graphProperty} quartersPrevious={quartersPrevious}
+                    graphProperty={graphProperty} quartersPrevious={quartersPrevious} changePending={pending}
                 />
             </div>
         )

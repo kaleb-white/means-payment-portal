@@ -1,17 +1,24 @@
+import { quartersToYearsAndQuarters } from "@/format_converter";
 import { DatabaseContext } from "../database/database_context";
 import { AnalyticsServices, DateInYearQuarter, ReportDataRow, ReportDataRowUncast, User } from "../database/interfaces";
 import { supabaseClient } from "./supabase_client";
 
 export class SupabaseAnayticsService implements AnalyticsServices {
-    async getUserQuarterlyReports(user: User, quarters: number | DateInYearQuarter[]): Promise<ReportDataRow[] | Error> {
+    async getUserQuarterlyReports(quarters: number | DateInYearQuarter[], user?: User): Promise<ReportDataRow[] | Error> {
         const supabase = await supabaseClient()
+        const dbContext = await DatabaseContext()
+
+        // If no user passed, get user from session
+        if (!user) {
+            user  = await dbContext.authService.getCurrentUser()
+        }
 
         // Get user (creator) coupon code
-        const creatorCoupon = await (await DatabaseContext()).userService.getUserCouponByUser(user)
+        const creatorCoupon = await dbContext.userService.getUserCouponByUser(user)
 
         let reportsToFetch: DateInYearQuarter[] = []
 
-        if (quarters instanceof Number) {
+        if (typeof(quarters) === "number") {
             // Transform quarters into list of years and quarters
             reportsToFetch = quartersToYearsAndQuarters(quarters as number)
         } else {
@@ -91,7 +98,4 @@ export class SupabaseAnayticsService implements AnalyticsServices {
 
         return castData[0]
     }
-}
-function quartersToYearsAndQuarters(arg0: number): DateInYearQuarter[] {
-    throw new Error("Function not implemented.");
 }
