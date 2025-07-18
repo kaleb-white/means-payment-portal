@@ -16,7 +16,6 @@ export default function Controls({
     quartersPrevious: number
 }) {
     const [menuShowing, setShowing] = useState(false)
-    const [testQuarters, setQuarters] = useState(4)
 
     return (
         <div className="flex flex-col mt-2 gap-2 text-xs md:text-lg">

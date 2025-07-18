@@ -35,25 +35,79 @@ export interface ReportDataRow {
     "Total (Net Revenue - Refund)": number
 }
 
+export interface DateInYearQuarter {
+    year: string,
+    quarter: string
+}
+
 export interface UserServices {
+    /**
+     * Not yet implemented
+     * @param id
+     */
     getUserById(id: string): Promise<User | null>
+    /**
+     * Not yet implemented
+     * @param id
+     * @param updates
+     */
     updateUser(id: string, updates: Partial<User>): Promise<User>
+    /**
+     * Not yet implemented
+     * @param id
+     */
     deleteUser(id: string): Promise<void>
+    /**
+     * Gets the user's coupon code. Does not perform auth checks.
+     * @param user - The current user, as returned by getCurrentUser.
+     * @returns A string containing the users unique coupon code.
+     */
     getUserCouponByUser(user: User): Promise<string | null>
 }
 
 export interface AuthServices {
-    // Does not return the user because their session should be set going forward
+    /**
+     * Signs up the user. Does not return the user because their session should be set going forward.
+     * PERFORM VALIDATION BEFORE USING!
+     * @param email - The user's submitted email.
+     * @param password - The user's submitted password.
+     * @returns Null on success, an error if the database returned an error.
+     */
     signUp(email: string, password: string): Promise<Error | null>
-    // Does not return the user because their session should be set going forward
+    /**
+     * Signs in the user. Does not return the user because their session should be set going forward.
+     * PERFORM VALIDATION BEFORE USING!
+     * @param email - The user's submitted email.
+     * @param password - The user's submitted password.
+     * @returns Null on success, an error if the database returned an error.
+     */
     signIn(email: string, password: string): Promise<Error | null>
+    /**
+     * Not implemented.
+     */
     signOut(): Promise<void>
-    // getCurrentUser should perform the same check as the middleware
-    // and redirect if no user is found or if an error is raised
+    /**
+     * Performs auth checks before getting the current user from the session.
+     * Implementation should perform the same auth checks the middleware is.
+     * Redirects to /?error=${error.message} (login page) on an error.
+     */
     getCurrentUser(): Promise<User>
 }
 
 export interface AnalyticsServices {
-    getUserQuarterlyReports(user: User, quarters: number): Promise<ReportDataRow[] | Error>
+    /**
+     * Concurrently fetches all reports from the database excluding the current report.
+     * Implementation removes reports that don't exist or contain no reportData (which is stored as a JSONB field).
+     * Implementation filters the JSONB data to remove all data not corresponding to the current user's coupon code.
+     * @param user - The user returned by getCurrentUser.
+     * @param quarters - Either a number of quarters starting from the current quarter and counting backwards or an array of DateInYearQuarter objects.
+     * @returns Either an array of reports or an Error.
+     */
+    getUserQuarterlyReports(user: User, quarters: number | DateInYearQuarter[]): Promise<ReportDataRow[] | Error>
+    /**
+     * Gets the in progress report, which is stored in its' own table.
+     * @param user - The user returned by getCurrentUser.
+     * @returns Either a report or an Error.
+     */
     getUserInProgressReport(user: User): Promise<ReportDataRow | Error>
 }

@@ -7,10 +7,10 @@ import { analyticsConfig } from "@/configs"
 
 export default async function Analytics() {
 
-    const user = await DatabaseContext().authService.getCurrentUser()
+    const user = await (await DatabaseContext()).authService.getCurrentUser()
 
-    const initialnAnalyticsData = DatabaseContext().analyticsService.getUserQuarterlyReports(user, analyticsConfig.defaultQuarters)
-    const currentData = DatabaseContext().analyticsService.getUserInProgressReport(user)
+    const initialnAnalyticsData = (await DatabaseContext()).analyticsService.getUserQuarterlyReports(user, analyticsConfig.defaultQuarters)
+    const currentData = (await DatabaseContext()).analyticsService.getUserInProgressReport(user)
 
     return (
         <div className="flex flex-row justify-center gap-2 md:gap-4">

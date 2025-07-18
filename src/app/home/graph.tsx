@@ -5,7 +5,7 @@ import { AnalyticsProperties } from "../_interfaces/types"
 
 import * as d3 from "d3"
 import { useEffect, useRef, useState } from "react"
-import { numberToFinancial } from "../_client_ui/format_converter"
+import { numberToFinancial } from "../../format_converter"
 
 
 

@@ -1,3 +1,5 @@
+'use server'
+
 import { SupabaseAnayticsService } from "../supabase/anayltics_service_impl";
 import { SupabaseAuthService } from "../supabase/auth_service_impl";
 import SupabaseUserService from "../supabase/user_service_impl";
@@ -7,7 +9,7 @@ let authService: AuthServices | null = null
 let analyticsService: AnalyticsServices | null = null
 let userService: UserServices | null = null
 
-export const DatabaseContext = () => {
+export const DatabaseContext = async () => {
     if (!authService) {
         authService = new SupabaseAuthService()
     }

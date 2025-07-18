@@ -12,7 +12,7 @@ import { DatabaseContext } from "../database/database_context";
 
 // Reference docs: https://supabase.com/docs/guides/auth/server-side/nextjs?queryGroups=router&router=app
 
-export async function signInSubmit(_previousState, formData: FormData) {
+export async function signInSubmit(_previousState: unknown, formData: FormData) {
 
     // Validate Fields
     const formEmail = formData.get("email"); const formPassword = formData.get("password");
@@ -25,7 +25,7 @@ export async function signInSubmit(_previousState, formData: FormData) {
     const data = parseResult.data as {email: string, password: string}
 
     // Call context
-    const error = await DatabaseContext().authService.signIn(data.email, data.password)
+    const error = await (await DatabaseContext()).authService.signIn(data.email, data.password)
 
     // On error redirect with error message in url params
     if (error instanceof Error) {revalidatePath(baseUrls.LOGIN); redirect(`${baseUrls.LOGIN}?error=${error.message}`)}
@@ -33,7 +33,7 @@ export async function signInSubmit(_previousState, formData: FormData) {
     redirect(baseUrls.ANALYTICS)
 }
 
-export async function signUpSubmit(_previousState, formData: FormData) {
+export async function signUpSubmit(_previousState: unknown, formData: FormData) {
     // Validate Fields
     const formEmail = formData.get("email"); const formPassword = formData.get("password");
     const parseResult = signInSchema.safeParse({email: formEmail, password: formPassword})
@@ -45,7 +45,7 @@ export async function signUpSubmit(_previousState, formData: FormData) {
     const data = parseResult.data as {email: string, password: string}
 
     // Call context
-    const error = await DatabaseContext().authService.signUp(data.email, data.password)
+    const error = await (await DatabaseContext()).authService.signUp(data.email, data.password)
 
     // On error redirect with error message in url params
     if (error instanceof Error) {revalidatePath(baseUrls.LOGIN); redirect(`${baseUrls.LOGIN}?error=${error.message}`)}

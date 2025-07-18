@@ -1,3 +1,5 @@
+import { DateInYearQuarter } from "./lib/services/database/interfaces"
+
 /**
  * Converts a number in the format [0-9]*.[0-9]{2} to $([0-9]{3},)*.[0-9]{2}. (Regex not exact).
  * If the number doesn't contain '.' in the last 3 positions, returns the string it was called with.
@@ -33,9 +35,37 @@ export function numberToFinancial(number: string): string {
     return o
 }
 
-function quarterToDate(quarter: string): Date {
-    // Period / quarter format: yyyyQn, ie 2025Q1
-    // Date constructor accepts YYYY-MM as valid date: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date#date_time_string_format
+/**
+ * Given a string in the format yyyyQn, ie 2025Q1, converts it into a TS Date object.
+ * Uses the YYYY-MM overload on the Date constructor: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date#date_time_string_format
+ * @param quarter
+ * @returns a new Date
+ */
+export function quarterToDate(quarter: string): Date {
     const month = Number(quarter.slice(-1)) * 3
     return new Date(`${quarter.slice(0, 4)}-${month < 10 ? `0${month}` : `${month}`}`)
+}
+
+/**
+ * Converts a number of quarters and a start year and quarter to the object used by the analytics service.
+ * @param quarters - Number of quarters previous to get reports for.
+ * @param year - Default is the current year.
+ * @param quarter - Default is the current quarter. A number between 1 and 4.
+ * @returns An array of type DateInYearQuarter[].
+ */
+export function quartersToYearsAndQuarters(
+    quarters: number,
+    year: number = new Date().getFullYear(),
+    quarter: number = Math.floor((new Date().getMonth() + 3) / 3) - 1 // Subtract 1 because current still in progress
+): DateInYearQuarter[] {
+    const returnArray = []
+    for (let _ = quarters; _ >= 1 ; _--) {
+        returnArray.push({year: String(year), quarter: String(quarter)})
+        quarter--
+        if (quarter === 0) {
+            year--
+            quarter = 4
+        }
+    }
+    return returnArray
 }

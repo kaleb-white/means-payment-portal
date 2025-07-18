@@ -1,16 +1,23 @@
 import { DatabaseContext } from "../database/database_context";
-import { AnalyticsServices, ReportDataRow, ReportDataRowUncast, User } from "../database/interfaces";
+import { AnalyticsServices, DateInYearQuarter, ReportDataRow, ReportDataRowUncast, User } from "../database/interfaces";
 import { supabaseClient } from "./supabase_client";
 
 export class SupabaseAnayticsService implements AnalyticsServices {
-    async getUserQuarterlyReports(user: User, quarters: number = 10): Promise<ReportDataRow[] | Error> {
+    async getUserQuarterlyReports(user: User, quarters: number | DateInYearQuarter[]): Promise<ReportDataRow[] | Error> {
         const supabase = await supabaseClient()
 
         // Get user (creator) coupon code
-        const creatorCoupon = await DatabaseContext().userService.getUserCouponByUser(user)
+        const creatorCoupon = await (await DatabaseContext()).userService.getUserCouponByUser(user)
 
-        // Transform quarters into list of years and quarters
-        const reportsToFetch = this.quartersToYearsAndQuarters(quarters)
+        let reportsToFetch: DateInYearQuarter[] = []
+
+        if (quarters instanceof Number) {
+            // Transform quarters into list of years and quarters
+            reportsToFetch = quartersToYearsAndQuarters(quarters as number)
+        } else {
+            // There are 0 WAYS that quarters could be a number but whatever
+            reportsToFetch = quarters as DateInYearQuarter[]
+        }
 
         // Create promises to execute for each possible report
         const reportsAwaitable = reportsToFetch.map(yearAndQuarter => {
@@ -22,7 +29,7 @@ export class SupabaseAnayticsService implements AnalyticsServices {
 
         // Run all promises
         const reports = (await Promise.all(reportsAwaitable))
-                        .filter(e => e?.data?.length !== 0) // Removes missing reports
+                        .filter(e => e && e?.data && e?.data?.length !== 0) // Removes missing reports
 
         // Filter received reports by creator coupon code to create output reports only for creator with certain coupon code
         // Second map statement converts from list of list of objs to list of objs
@@ -44,22 +51,6 @@ export class SupabaseAnayticsService implements AnalyticsServices {
         const filteredByCouponCode = this.rdrUncastToCast(filteredByCouponCodeUncast)
 
         return filteredByCouponCode
-    }
-
-    // Helper for getUserQuarterlyReports to create the reports to get from a number of quarters
-    quartersToYearsAndQuarters(quarters: number) {
-        let year = new Date().getFullYear()
-        let quarter = Math.floor((new Date().getMonth() + 3) / 3) - 1 // Subtract 1 because current quarter still in progress
-        const returnArray = []
-        for (let _ = quarters; _ >= 1 ; _--) {
-            returnArray.push({year: String(year), quarter: String(quarter)})
-            quarter--
-            if (quarter === 0) {
-                year--
-                quarter = 4
-            }
-        }
-        return returnArray
     }
 
     // Helper for getUserQuarterly reports to cast from ReportDataRowUncast to ReportDataRowCast
@@ -88,7 +79,7 @@ export class SupabaseAnayticsService implements AnalyticsServices {
         const supabase = await supabaseClient()
 
         // Get user coupon code
-        const creatorCoupon = await DatabaseContext().userService.getUserCouponByUser(user)
+        const creatorCoupon = await (await DatabaseContext()).userService.getUserCouponByUser(user)
 
         // Fetch from DB
         const { data, error } = await supabase.from('in_progress').select('*').eq("Coupon Code", creatorCoupon).limit(1)
@@ -100,4 +91,7 @@ export class SupabaseAnayticsService implements AnalyticsServices {
 
         return castData[0]
     }
+}
+function quartersToYearsAndQuarters(arg0: number): DateInYearQuarter[] {
+    throw new Error("Function not implemented.");
 }

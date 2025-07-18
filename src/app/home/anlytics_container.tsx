@@ -2,10 +2,11 @@
 import { analyticsConfig } from "@/configs"
 import { ReportDataRow } from "@/lib/services/database/interfaces"
 
-import { use, useState } from "react"
+import { use, useEffect, useState } from "react"
 import Graph from "./graph"
 import { AnalyticsProperties } from "../_interfaces/types"
 import Controls from "./controls"
+import { DatabaseContext } from "@/lib/services/database/database_context"
 
 export default function AnalyticsContainer({
     initialDataStream,
@@ -22,14 +23,25 @@ export default function AnalyticsContainer({
     const initialData = use(initialDataStream)
     const initialCurrentData = use(initialCurrentDataStream)
 
-    let reportData: ReportDataRow[] = []
+    // Report data
+    const [reportData, setReportData] = useState(
+        (!(initialData instanceof Error) && !(initialCurrentData instanceof Error))?
+        initialData.concat(initialCurrentData) :
+        new Error("Report data failed to load.")
+    )
 
-    if (!(initialData instanceof Error) && !(initialCurrentData instanceof Error)) {
-        reportData = initialData.concat([initialCurrentData])
-    }
+    // Update graph data on change to quartersPrevious
+    useEffect (() => {
+        async function fetchQuarterlyReports() {
+            
+        }
 
-    if (initialData instanceof Error || initialCurrentData instanceof Error) {
-        return (<></>)
+        fetchQuarterlyReports()
+    }, [quartersPrevious])
+
+
+    if (reportData instanceof Error) {
+        return (<>{reportData.message}</>)
     } else {
         return (
             <div className="flex flex-col mx-auto means-border md:justify-center p-2 md:p-8 my-4 md:my-8 gap-4 text-black">

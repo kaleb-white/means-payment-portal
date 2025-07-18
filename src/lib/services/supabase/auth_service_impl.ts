@@ -39,6 +39,7 @@ export class SupabaseAuthService implements AuthServices {
         const supabase = await supabaseClient()
         const { data, error } = await supabase.auth.getUser()
         if (error) redirect(`/?error=${error.message}`)
+        if (!data.user) redirect(`/?error=${"null user returned while trying to find user"}`)
         return data.user as User
     }
 }
