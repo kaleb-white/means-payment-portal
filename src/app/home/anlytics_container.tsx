@@ -68,7 +68,7 @@ export default function AnalyticsContainer({
         return (
             <div className="flex flex-col mx-auto means-border md:justify-center p-2 md:p-8 my-4 md:my-8 gap-4 text-black">
                 <div className="w-full md:w-[1000px] md:h-[300px]">
-                    <Graph reportData={reportData} property={graphProperty} maxWidth={1000} height={300}/>
+                    <Graph reportDataUnsorted={reportData} property={graphProperty} maxWidth={1000} height={300}/>
                 </div>
                 <Controls
                     reportData={reportData}

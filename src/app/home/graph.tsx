@@ -5,7 +5,7 @@ import { AnalyticsProperties } from "../_interfaces/types"
 
 import * as d3 from "d3"
 import { useEffect, useRef} from "react"
-import { numberToFinancial } from "../../format_converter"
+import { numberToFinancial, quarterToDate } from "../../format_converter"
 
 
 
@@ -14,9 +14,9 @@ import { numberToFinancial } from "../../format_converter"
 //              https://observablehq.com/@d3/bar-chart/2
 
 export default function Graph({
-    reportData, property, maxWidth, height
+    reportDataUnsorted, property, maxWidth, height
 }: {
-    reportData: ReportDataRow[], property: AnalyticsProperties, maxWidth: number, height: number
+    reportDataUnsorted: ReportDataRow[], property: AnalyticsProperties, maxWidth: number, height: number
 }) {
     const ref = useRef(null)
 
@@ -27,7 +27,6 @@ export default function Graph({
         const windowScreenWidth = window.screen.availWidth - 100
         const width = min(1000, windowScreenWidth)
 
-
         // Constants
         const margin = { top: 10, right: 10, bottom: 15, left: 40 };
         const innerWidth = width - margin.left - margin.right
@@ -36,6 +35,9 @@ export default function Graph({
         const rectPadding = 5
         const textPaddingX = windowScreenWidth < 1000? -2 : 5
         const textPaddingY = windowScreenWidth < 1000? 5 : 7
+
+        // Sort data
+        const reportData = reportDataUnsorted.sort((a, b) => quarterToDate(a.Period) < quarterToDate(b.Period)? -1: 1)
 
         // x scale
         const x = d3.scaleBand()
@@ -57,6 +59,7 @@ export default function Graph({
 
         // Remove all bars and text before rerendering
         svg.selectAll('rect, .graph-text').remove()
+
 
         // Add data-dependent svg elements
         svg.selectAll("rect.bar")
@@ -137,7 +140,7 @@ export default function Graph({
                 .attr("class", "y-axis y-axis-text")
             .transition()
 
-    }, [maxWidth, height, reportData, property])
+    }, [maxWidth, height, reportDataUnsorted, property])
 
     const min = (a:number, b:number) => (a < b)? a : b
 
