@@ -23,19 +23,24 @@
     }
 
     /* Graph styles */
-    .graph-text-white {
+    .graph-font-global {
         font-family: Inter;
-        color: white;
     }
 
-    .graph-text-rect {
-        fill: black;
+    .x-axis-text {
+        color: white;
+        @apply text-[9px] md:text-lg
+    }
+
+    .y-axis-text {
+        font-family: Inter;
+        color: white;
+        @apply text-[9px]
     }
 
     .graph-text {
         fill: white;
         color: white;
-        font-family: Inter;
-        font-size: 10;
+        @apply text-[7px] md:text-sm;
     }
 }

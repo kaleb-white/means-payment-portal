@@ -4,7 +4,7 @@ import { ReportDataRow } from "@/lib/services/database/interfaces"
 import { AnalyticsProperties } from "../_interfaces/types"
 
 import * as d3 from "d3"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef} from "react"
 import { numberToFinancial } from "../../format_converter"
 
 
@@ -14,14 +14,18 @@ import { numberToFinancial } from "../../format_converter"
 //              https://observablehq.com/@d3/bar-chart/2
 
 export default function Graph({
-    reportData, property, width, height
+    reportData, property, maxWidth, height
 }: {
-    reportData: ReportDataRow[], property: AnalyticsProperties, width: number, height: number
+    reportData: ReportDataRow[], property: AnalyticsProperties, maxWidth: number, height: number
 }) {
     const ref = useRef(null)
 
     useEffect(() => {
         if (!ref.current) return
+
+        // Set width as min of screen with padding or maxWidth
+        const windowScreenWidth = window.screen.availWidth - 100
+        const width = min(1000, windowScreenWidth)
 
 
         // Constants
@@ -30,7 +34,8 @@ export default function Graph({
         const innerHeight = height - margin.top - margin.bottom
 
         const rectPadding = 5
-        const textPadding = 5
+        const textPaddingX = windowScreenWidth < 1000? -2 : 5
+        const textPaddingY = windowScreenWidth < 1000? 5 : 7
 
         // x scale
         const x = d3.scaleBand()
@@ -85,11 +90,11 @@ export default function Graph({
                     .attr("class", "graph-text")
                     .attr("x", d => (
                         (x(d.Period) ?? 0) + margin.left) + rectPadding
-                        + textPadding
+                        + textPaddingX
                     )
                     .attr("y",
                         d => y(d[property]) - rectPadding +
-                        (y(d[property]) - rectPadding <= 0? 2 * textPadding : (-textPadding))
+                        (y(d[property]) - rectPadding <= 0? 2 * textPaddingY : (-textPaddingY))
                     )
 
                 return bar
@@ -109,7 +114,7 @@ export default function Graph({
             .text(d => numberToFinancial(String((d as ReportDataRow)[property])))
             .attr("y",
                 d => y((d as ReportDataRow)[property]) - rectPadding +
-                (y((d as ReportDataRow)[property]) - rectPadding <= 0? 2 * textPadding : (-textPadding))
+                (y((d as ReportDataRow)[property]) - rectPadding <= 0? 2 * textPaddingY : (-textPaddingY))
             )
 
         // Remove old axes
@@ -121,22 +126,25 @@ export default function Graph({
             .attr("transform", `translate(${margin.left}, ${innerHeight})`)
             .call(d3.axisBottom(x))
             .selectAll("text")
-                .attr("class", "y-axis graph-text-white")
+                .attr("class", "x-axis x-axis-text")
                 .attr("font-size", 15)
 
         // Add the y-axis and label
         svg.append("g")
-            .attr('class', 'axis-group graph-text-white')
+            .attr('class', 'axis-group')
             .attr("transform", `translate(${margin.left}, 0)`)
             .call(d3.axisLeft(y))
-                .attr("class", "x-axis graph-text-white")
+                .attr("class", "y-axis y-axis-text")
             .transition()
 
-    }, [width, height, reportData, property])
+    }, [maxWidth, height, reportData, property])
+
+    const min = (a:number, b:number) => (a < b)? a : b
 
     return (
         <>
             <svg
+                className='graph-font-global'
                 ref={ref}
             />
         </>
