@@ -71,6 +71,7 @@ export default function AnalyticsContainer({
                     <Graph reportData={reportData} property={graphProperty} maxWidth={1000} height={300}/>
                 </div>
                 <Controls
+                    reportData={reportData}
                     setGraphProperty={setGraphProperty} setQuartersPrevious={setQuartersPrevious}
                     graphProperty={graphProperty} quartersPrevious={quartersPrevious} changePending={pending}
                 />
