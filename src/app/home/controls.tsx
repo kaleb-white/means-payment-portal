@@ -1,4 +1,5 @@
-import { Dispatch, SetStateAction, useState } from "react"
+'use client'
+import { Dispatch, SetStateAction, useRef, useState } from "react"
 import clsx from "clsx";
 
 import { AnalyticsProperties, AnalyticsPropertiesAsArray } from "../_interfaces/types"
@@ -19,6 +20,17 @@ export default function Controls({
 }) {
     const [menuShowing, setShowing] = useState(false)
 
+    // Very janky :) - adds a check to see if menu is open and if a click happened outside the menu
+    // Closes it if true
+    document.body.addEventListener('click', e => {
+        if (
+            menuShowing &&
+            !document.getElementById('#menu-container')?.contains(e.target as Node)
+        ) {
+            setShowing(false)
+        }
+    })
+
     return (
         <div className="flex flex-col mt-2 gap-2 text-xs md:text-lg">
             <div className="flex flex-row gap-5">
@@ -27,7 +39,7 @@ export default function Controls({
                 <div className="text-means-red">PROPERTY</div>
                 <div role="menu" className="text-white max-w-32 md:max-w-none min-w-32 md:min-w-none cursor-pointer" onClick={_ => setShowing(!menuShowing)}>
                     {graphProperty} {menuShowing? "▽" : "▷"}
-                    <div className={clsx(
+                    <div id="menu-container" className={clsx(
                         "transition-all duration-300 ease-out",
                         "text-white text-2xs md:text-sm absolute means-border bg-black flex flex-col gap-0.5",
                         {
