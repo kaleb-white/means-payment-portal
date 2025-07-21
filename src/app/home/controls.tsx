@@ -45,8 +45,8 @@ export default function Controls({
         })
 
         // Set values
-        setSum(numberToFinancial(String(sum)))
-        setYearSum(numberToFinancial(String(yearSum)))
+        setSum(graphProperty === 'Number of Subscribers'? String(sum) : numberToFinancial(String(sum)))
+        setYearSum(graphProperty === 'Number of Subscribers'? String(yearSum) : numberToFinancial(String(yearSum)))
     }, [reportData, graphProperty])
 
     return (
@@ -104,14 +104,14 @@ export default function Controls({
             {/* Data totals */}
             <div className="flex flex-col gap-2">
                 {/* Sum */}
-                <div className="flex flex-row gap-5">
-                    <div className="text-means-red">SUM OVER PERIOD</div>
+                <div className="flex flex-row-reverse gap-5">
                     <div className="text-white">{sum}</div>
+                    <div className="text-means-red">SUM OVER PERIOD</div>
                 </div>
                 {/* Current year */}
-                <div className="flex flex-row gap-5">
-                    <div className="text-means-red">CURRENT YEAR</div>
+                <div className="flex flex-row-reverse gap-5">
                     <div className="text-white">{yearSum}</div>
+                    <div className="text-means-red">CURRENT YEAR</div>
                 </div>
             </div>
         </div>

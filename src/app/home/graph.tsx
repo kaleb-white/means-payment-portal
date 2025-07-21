@@ -89,7 +89,6 @@ export default function Graph({
 
                 // text
                 enter.append("text")
-                    .text(d => numberToFinancial(String(d[property])))
                     .attr("class", "graph-text")
                     .attr("x", d => (
                         (x(d.Period) ?? 0) + margin.left) + rectPadding
@@ -114,7 +113,11 @@ export default function Graph({
 
         // Text transition
         svg.selectAll('.graph-text').transition()
-            .text(d => numberToFinancial(String((d as ReportDataRow)[property])))
+            .text(d => {
+                return (property as string) === 'Number of Subscribers'?
+                String((d as ReportDataRow)[property]) :
+                numberToFinancial(String((d as ReportDataRow)[property]))}
+            )
             .attr("y",
                 d => y((d as ReportDataRow)[property]) - rectPadding +
                 (y((d as ReportDataRow)[property]) - rectPadding <= 0? 2 * textPaddingY : (-textPaddingY))
