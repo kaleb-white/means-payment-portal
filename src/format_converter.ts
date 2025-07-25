@@ -37,10 +37,31 @@ export function quarterToDate(quarter: string): Date {
 }
 
 /**
+ * Given a DateInYearQuarter object, converst it into a TS Date object.
+ * Uses the YYYY-MM overload on the Date constructor: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date#date_time_string_format
+ * @param quarter
+ * @returns a new Date
+ */
+export function dateInYearQuarterToDate(quarter: DateInYearQuarter): Date {
+    const month = Number(quarter.quarter) * 3
+    return new Date(`${quarter.year}-${month < 10 ? `0${month}` : `${month}`}`)
+}
+
+/**
+ * Given a string in the format yyyyQn, ie 2025Q1, converst it into a DateInYearQuarter object.
+ * For example, 2025Q1 becomes {year: "2025", quarter:"1"}
+ * @param quarter
+ * @returns a new DateInYearQuarter
+ */
+export function quarterToDateInYearQuarter(quarter: string): DateInYearQuarter {
+    return {year: quarter.slice(0,4), quarter: quarter.slice(-1)}
+}
+
+/**
  * Converts a number of quarters and a start year and quarter to the object used by the analytics service.
- * @param quarters - Number of quarters previous to get reports for.
- * @param year - Default is the current year.
- * @param quarter - Default is the current quarter. A number between 1 and 4.
+ * @param quarters Number of quarters previous to get reports for.
+ * @param year Default is the current year.
+ * @param quarter Default is the current quarter. A number between 1 and 4.
  * @returns An array of type DateInYearQuarter[].
  */
 export function quartersToYearsAndQuarters(

@@ -13,14 +13,14 @@ export default function Controls({
     setGraphProperty,
     setQuartersPrevious,
     graphProperty,
-    quartersPrevious,
+    quarters,
     changePending
 }: {
     reportData: ReportDataRow[],
     setGraphProperty: Dispatch<SetStateAction<AnalyticsProperties>>,
     setQuartersPrevious: Dispatch<SetStateAction<number>>,
     graphProperty: AnalyticsProperties,
-    quartersPrevious: number,
+    quarters: number,
     changePending: boolean
 }) {
     const [menuShowing, setShowing] = useState(false)
@@ -88,15 +88,15 @@ export default function Controls({
                     <div className="text-means-red">QUARTERS</div>
                     <div className="flex flex-row gap-3">
                         {/* + */}
-                        <div className="means-border px-1" onClick={_ => setQuartersPrevious(quartersPrevious - 1)}>－</div>
+                        <div className="means-border px-1" onClick={_ => setQuartersPrevious(quarters - 1)}>－</div>
                         {/* Numerical input box */}
                         <input
                             onChange={e => setQuartersPrevious(Number(e.target.value))}
                             className="means-border bg-means-grey w-8 text-center text-black"
-                            value={quartersPrevious}
+                            value={quarters}
                         />
                         {/* - */}
-                        <div className="means-border px-1" onClick={_ => setQuartersPrevious(quartersPrevious + 1)}>＋</div>
+                        <div className="means-border px-1" onClick={_ => setQuartersPrevious(quarters + 1)}>＋</div>
                     </div>
                     {changePending? <Spinner size={20} /> : <></>}
                 </div>

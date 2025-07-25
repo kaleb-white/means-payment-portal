@@ -7,7 +7,7 @@ import Graph from "./graph"
 import Controls from "./controls"
 
 import { startTransition, use, useActionState, useEffect, useRef, useState } from "react"
-import { quartersToYearsAndQuarters } from "@/format_converter"
+import { quartersToYearsAndQuarters, quarterToDateInYearQuarter } from "@/format_converter"
 import clsx from "clsx"
 
 export default function AnalyticsContainer({
@@ -19,7 +19,7 @@ export default function AnalyticsContainer({
 }) {
     // Graph controls
     const [graphProperty, setGraphProperty] = useState(analyticsConfig.defaultProperty as AnalyticsProperties)
-    const [quartersPrevious, setQuartersPrevious] = useState(analyticsConfig.defaultQuarters as number)
+    const [quarters, setQuartersPrevious] = useState(analyticsConfig.defaultQuarters as number)
 
     // Graph data
     const initialData = use(initialDataStream)
@@ -33,35 +33,60 @@ export default function AnalyticsContainer({
     )
 
     // Fetch new report data
-    const preventInitial = useRef(true)
+    const currentQuartersArray = useRef(quartersToYearsAndQuarters(quarters)) // Start at 4
+    const currentQuartersFetched = useRef(reportData instanceof Error? [] : reportData) // Start at report data
     const [_, action, pending] = useActionState(
         async () => {
-            const quartersConverted = quartersToYearsAndQuarters(quartersPrevious)
-            const response = await fetch('api/get-quarterly-reports', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(quartersConverted)
+            // Get the quarters that need fetched
+            const quartersConverted = quartersToYearsAndQuarters(quarters)
+
+            // Filter out any that we already have
+            const quartersToFetch = quartersConverted.filter(q => {
+                return currentQuartersArray.current.every(cq => {
+                    if (cq.quarter === q.quarter && cq.year === q.year) return false
+                    return true
+                })
             })
-            if (response.status !== 200) {
-                return // TODO
+
+            // If there aren't any to fetch, skip the fetching (ie, quarter amt decreased)
+            if (quartersToFetch.length > 0) {
+                // Fetch the quarters
+                const response = await fetch('api/get-quarterly-reports', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(quartersToFetch)
+                })
+                if (response.status !== 200) {
+                    return // TODO
+                }
+                const r = await response.json() as Array<ReportDataRow>
+
+                // Since we succesfully fetched the quarters, update quarters we have
+                currentQuartersArray.current = currentQuartersArray.current.concat(quartersToFetch)
+                currentQuartersFetched.current = currentQuartersFetched.current.concat(r)
             }
-            const r = await response.json() as Array<ReportDataRow>
-            if (!(initialCurrentData instanceof Error)) {
-                r.push(initialCurrentData)
-            }
-            setReportData(r)
+
+            // Filter all the reports we have by the current number of quarters
+            setReportData(currentQuartersFetched.current.filter(
+                q => !quartersConverted.every(cq => {
+                    const qAsYearQuarter = quarterToDateInYearQuarter(q.Period)
+                    if (cq.quarter === qAsYearQuarter.quarter && cq.year === qAsYearQuarter.year) return false
+                    return true
+
+                })
+            ))
         },
         null
     )
 
+    // Call our action on hydration
     useEffect (() => {
-        if (preventInitial.current) {preventInitial.current = false; return}
         async function transitionReportData() {startTransition(action)}
         transitionReportData()
-    }, [quartersPrevious, action])
+    }, [quarters, action])
 
     if (reportData instanceof Error) {
         return (<>{reportData.message}</>)
@@ -74,7 +99,7 @@ export default function AnalyticsContainer({
                 <Controls
                     reportData={reportData}
                     setGraphProperty={setGraphProperty} setQuartersPrevious={setQuartersPrevious}
-                    graphProperty={graphProperty} quartersPrevious={quartersPrevious} changePending={pending}
+                    graphProperty={graphProperty} quarters={quarters} changePending={pending}
                 />
             </div>
         )
