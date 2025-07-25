@@ -5,6 +5,7 @@ import clsx from "clsx";
 import { AnalyticsProperties, AnalyticsPropertiesAsArray } from "../_interfaces/types"
 import { ReportDataRow } from "@/lib/services/database/interfaces";
 import { numberToFinancial } from "@/format_converter";
+import { Spinner } from "../_client_ui/spinner";
 
 
 export default function Controls({
@@ -97,7 +98,7 @@ export default function Controls({
                         {/* - */}
                         <div className="means-border px-1" onClick={_ => setQuartersPrevious(quartersPrevious + 1)}>＋</div>
                     </div>
-                    {changePending? <div className="flex items-center"><div className="animate-spin border-means-red size-5 rounded-full border-4 border-t-transparent"></div></div> : <></>}
+                    {changePending? <Spinner size={20} /> : <></>}
                 </div>
             </div>
 

@@ -1,7 +1,9 @@
 export enum baseUrls {
     LOGIN='/',
     ANALYTICS='/home',
-    PAYMENT_INFO='/home/payment-info'
+    PAYMENT_INFO='/home/payment-info',
+    SIGN_OUT='/signout'
+
 }
 
 export enum analyticsConfig {
@@ -10,6 +12,6 @@ export enum analyticsConfig {
 }
 
 export enum graphConfig {
-    graphHeightDesktop=400,
-    graphWidthDesktop=800
+    graphHeight=300,
+    graphWidthMax=1000
 }

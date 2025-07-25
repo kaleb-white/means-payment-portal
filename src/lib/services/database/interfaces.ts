@@ -84,9 +84,10 @@ export interface AuthServices {
      */
     signIn(email: string, password: string): Promise<Error | null>
     /**
-     * Not implemented.
+     * Signs out the user and redirects to the login page.
+     * On an error, redirects to the login page with the error displayed.
      */
-    signOut(): Promise<void>
+    signOut(): Promise<Error | null>
     /**
      * Performs auth checks before getting the current user from the session.
      * Implementation should perform the same auth checks the middleware is.

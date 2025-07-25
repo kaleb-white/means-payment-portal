@@ -25,7 +25,7 @@ export default function Graph({
 
         // Set width as min of screen with padding or maxWidth
         const windowScreenWidth = window.screen.availWidth - 100
-        const width = min(1000, windowScreenWidth)
+        const width = min(maxWidth, windowScreenWidth)
 
         // Constants
         const margin = { top: 10, right: 10, bottom: 15, left: 40 };

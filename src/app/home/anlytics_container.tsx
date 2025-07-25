@@ -1,5 +1,5 @@
 'use client'
-import { analyticsConfig } from "@/configs"
+import { analyticsConfig, graphConfig } from "@/configs"
 import { ReportDataRow } from "@/lib/services/database/interfaces"
 
 import { AnalyticsProperties } from "../_interfaces/types"
@@ -8,6 +8,7 @@ import Controls from "./controls"
 
 import { startTransition, use, useActionState, useEffect, useRef, useState } from "react"
 import { quartersToYearsAndQuarters } from "@/format_converter"
+import clsx from "clsx"
 
 export default function AnalyticsContainer({
     initialDataStream,
@@ -67,8 +68,8 @@ export default function AnalyticsContainer({
     } else {
         return (
             <div className="flex flex-col mx-auto means-border md:justify-center p-2 md:p-8 my-4 md:my-8 gap-4 text-black">
-                <div className="w-full md:w-[1000px] md:h-[300px]">
-                    <Graph reportDataUnsorted={reportData} property={graphProperty} maxWidth={1000} height={300}/>
+                <div className={clsx(`w-full md:w-[${graphConfig.graphWidthMax}px] md:h-[${graphConfig.graphHeight}px]`)}>
+                    <Graph reportDataUnsorted={reportData} property={graphProperty} maxWidth={graphConfig.graphWidthMax} height={graphConfig.graphHeight}/>
                 </div>
                 <Controls
                     reportData={reportData}

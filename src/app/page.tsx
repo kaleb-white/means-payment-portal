@@ -36,7 +36,7 @@ export default function Login() {
   const error = searchParams.get("error")
   // Custom error messages for specific messages
   const extendedErrorMessage =
-    error === 'fetch failed' ? "Check your internet connection" : ""
+    error === 'fetch failed' ? " Check your internet connection. " : ""
 
 
   return (
@@ -45,7 +45,7 @@ export default function Login() {
       <Image src="/meanstv_logo.png" alt="Means TV" width={662} height={100} className="p-6 mx-auto"/>
 
       <div className={clsx('w-full mb-4 mx-auto text-center text-sm overflow-clip text-means-red-error', {'hidden': !error})}>
-        Encountered an error: {error}. {extendedErrorMessage}. If the issue persists, please contact means.
+        Encountered an error: {error}.{extendedErrorMessage} If the issue persists, please contact means.
         Please sign in again.
       </div>
 

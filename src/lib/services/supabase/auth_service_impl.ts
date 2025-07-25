@@ -30,9 +30,11 @@ export class SupabaseAuthService implements AuthServices {
         return null
     }
 
-    async signOut(): Promise<void> {
+    async signOut(): Promise<Error | null> {
         const supabase = await supabaseClient()
-        supabase.auth.signOut()
+        const { error } = await supabase.auth.signOut()
+        if (!error) return null
+        return error
     }
 
     async getCurrentUser(): Promise<User> {

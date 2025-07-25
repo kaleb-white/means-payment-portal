@@ -1,6 +1,6 @@
 "use server"
 
-import {baseUrls } from "@/configs";
+import { baseUrls } from "@/configs";
 
 import { signInSchema } from "../../zod";
 import { treeifyError } from "zod";
@@ -51,4 +51,11 @@ export async function signUpSubmit(_previousState: unknown, formData: FormData) 
     if (error instanceof Error) {revalidatePath(baseUrls.LOGIN); redirect(`${baseUrls.LOGIN}?error=${error.message}`)}
 
     redirect(baseUrls.ANALYTICS)
+}
+
+export async function signOutSubmit() {
+    const dbContext = await DatabaseContext()
+    const error = await dbContext.authService.signOut()
+    if (error) redirect(`${baseUrls.LOGIN}?error=${error.message}`)
+    redirect(baseUrls.LOGIN)
 }
