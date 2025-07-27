@@ -1,7 +1,11 @@
 import { type NextRequest } from 'next/server'
 import { updateSession } from './lib/services/supabase/middleware'
+import { jwtDecode } from 'jwt-decode'
+import { supabaseClient } from './lib/services/supabase/supabase_client'
 
 export async function middleware(request: NextRequest) {
+  const supabase = await supabaseClient()
+  const session = (await supabase.auth.getSession()).data.session
   return await updateSession(request)
 }
 

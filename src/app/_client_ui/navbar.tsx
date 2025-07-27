@@ -42,14 +42,14 @@ export default function Navbar() {
                     Payment Info
                 </Link>
             </div>
-            <div className="contents md:flex md:flex-row-reverse md:w-1/6 text-means-red text-sm md:text-2xl items-center">
+            <div className="flex md:flex-row-reverse md:w-1/6 text-means-red text-sm md:text-2xl md:items-center">
                 <button className={clsx("md:p-1 md:means-border cursor-pointer", {
                     'text-means-pending cursor-auto': signOutPending
                 })} onClick={() => startTransition(signOutAction)}>
                     Log Out
                 </button>
                 <div className={clsx({"hidden": !signOutPending})}>
-                    <Spinner size={20} />
+                    <Spinner />
                 </div>
             </div>
         </div>

@@ -41,7 +41,13 @@ export interface DateInYearQuarter {
     quarter: string
 }
 
+export interface UserServicesObj {}
+export interface AuthServicesObj{}
+export interface AnalyticsServicesObj {}
+export interface AdminServicesObj{}
+
 export interface UserServices {
+    new(): UserServicesObj // Necessary because typescript infers this is a constructor interface not a class interface
     /**
      * Not yet implemented
      * @param id
@@ -67,6 +73,7 @@ export interface UserServices {
 }
 
 export interface AuthServices {
+    new(): AuthServicesObj
     /**
      * Signs up the user. Does not return the user because their session should be set going forward.
      * PERFORM VALIDATION BEFORE USING!
@@ -97,6 +104,7 @@ export interface AuthServices {
 }
 
 export interface AnalyticsServices {
+    new(): AnalyticsServicesObj
     /**
      * Concurrently fetches all reports from the database excluding the current report.
      * Implementation removes reports that don't exist or contain no reportData (which is stored as a JSONB field).
@@ -108,8 +116,17 @@ export interface AnalyticsServices {
     getUserQuarterlyReports(quarters: number | DateInYearQuarter[], user?: User): Promise<ReportDataRow[] | Error>
     /**
      * Gets the in progress report, which is stored in its' own table.
-     * @param user - The user returned by getCurrentUser.
+     * @param user The user returned by getCurrentUser.
      * @returns Either a report or an Error.
      */
     getUserInProgressReport(user: User): Promise<ReportDataRow | Error>
+}
+
+export interface AdminServices {
+    new(): AdminServicesObj
+    /**
+     *
+     * @param user Either a specific user or the user returned by getCurrentUser.
+     */
+    isUserAdmin(user?: User): Promise<boolean>
 }

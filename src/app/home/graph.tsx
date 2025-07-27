@@ -7,11 +7,9 @@ import * as d3 from "d3"
 import { useEffect, useRef} from "react"
 import { numberToFinancial, quarterToDate } from "../../format_converter"
 
-
-
-// Reference:   https://2019.wattenberger.com/blog/react-and-d3
-//              https://observablehq.com/@d3/d3-scaletime
-//              https://observablehq.com/@d3/bar-chart/2
+// Some d3 references:  https://2019.wattenberger.com/blog/react-and-d3
+//                      https://observablehq.com/@d3/d3-scaletime
+//                      https://observablehq.com/@d3/bar-chart/2
 
 export default function Graph({
     reportDataUnsorted, property, maxWidth, height

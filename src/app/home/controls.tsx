@@ -98,7 +98,7 @@ export default function Controls({
                         {/* - */}
                         <div className="means-border px-1" onClick={_ => setQuartersPrevious(quarters + 1)}>＋</div>
                     </div>
-                    {changePending? <Spinner size={20} /> : <></>}
+                    {changePending? <Spinner /> : <></>}
                 </div>
             </div>
 

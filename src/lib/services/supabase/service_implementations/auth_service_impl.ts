@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
-import { User, AuthServices } from "../database/interfaces";
-import { supabaseClient } from "./supabase_client";
+import { User, AuthServicesObj } from "../../database/interfaces";
+import { supabaseClient } from "../supabase_client";
 
-export class SupabaseAuthService implements AuthServices {
-    async signUp(email: string, password: string): Promise<Error | null> {
+export class SupabaseAuthService implements AuthServicesObj {
+    static async signUp(email: string, password: string): Promise<Error | null> {
+        'use server'
         const supabase = await supabaseClient()
 
         // Check for current user and sign them out
@@ -17,7 +18,8 @@ export class SupabaseAuthService implements AuthServices {
         return null
     }
 
-    async signIn(email: string, password: string): Promise<Error |  null> {
+    static async signIn(email: string, password: string): Promise<Error |  null> {
+        'use server'
         const supabase = await supabaseClient()
 
         // Check for current user and sign them out
@@ -30,14 +32,16 @@ export class SupabaseAuthService implements AuthServices {
         return null
     }
 
-    async signOut(): Promise<Error | null> {
+    static async signOut(): Promise<Error | null> {
+        'use server'
         const supabase = await supabaseClient()
         const { error } = await supabase.auth.signOut()
         if (!error) return null
         return error
     }
 
-    async getCurrentUser(): Promise<User> {
+    static async getCurrentUser(): Promise<User> {
+        'use server'
         const supabase = await supabaseClient()
         const { data, error } = await supabase.auth.getUser()
         if (error) redirect(`/?error=${error.message}`)

@@ -21,6 +21,7 @@ const eslintConfig = [
           caughtErrorsIgnorePattern: "^_", // Ignore unused `catch` params
         },
       ],
+      "@typescript-eslint/no-empty-object-type": "off",
     },
   },
 ];
