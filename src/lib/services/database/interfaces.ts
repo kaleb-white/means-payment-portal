@@ -125,8 +125,7 @@ export interface AnalyticsServices {
 export interface AdminServices {
     new(): AdminServicesObj
     /**
-     *
-     * @param user Either a specific user or the user returned by getCurrentUser.
+     * Checks that sthe JWT property user_role is 'admin'.
      */
-    isUserAdmin(user?: User): Promise<boolean>
+    isUserAdmin(): Promise<boolean>
 }

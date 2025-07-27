@@ -3,6 +3,7 @@
 import { SupabaseAnayticsService } from "../supabase/service_implementations/anayltics_service_impl";
 import { SupabaseAuthService } from "../supabase/service_implementations/auth_service_impl";
 import { SupabaseUserService } from "../supabase/service_implementations/user_service_impl";
+import { SupabaseAdminService } from "../supabase/service_implementations/admin_service_impl";
 
 export const DatabaseContext = async () => {
     // Why not just export the services? Why reassign them?
@@ -24,11 +25,15 @@ export const DatabaseContext = async () => {
         static deleteUser = SupabaseUserService.deleteUser
         static getUserCouponByUser = SupabaseUserService.getUserCouponByUser
     }
+    class adminService extends SupabaseAdminService {
+        static isUserAdmin = SupabaseAdminService.isUserAdmin
+    }
 
     return {
         authService,
         analyticsService,
-        userService
+        userService,
+        adminService
     }
 
 }

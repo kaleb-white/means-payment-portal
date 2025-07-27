@@ -2,7 +2,8 @@ export enum baseUrls {
     LOGIN='/',
     ANALYTICS='/home',
     PAYMENT_INFO='/home/payment-info',
-    SIGN_OUT='/signout'
+    SIGN_OUT='/signout',
+    ADMIN_BASE_URL='/admin'
 
 }
 

@@ -1,11 +1,20 @@
-import { type NextRequest } from 'next/server'
+import { NextResponse, type NextRequest } from 'next/server'
 import { updateSession } from './lib/services/supabase/middleware'
-import { jwtDecode } from 'jwt-decode'
-import { supabaseClient } from './lib/services/supabase/supabase_client'
+import { DatabaseContext } from './lib/services/database/database_context'
+import { baseUrls } from './configs'
 
 export async function middleware(request: NextRequest) {
-  const supabase = await supabaseClient()
-  const session = (await supabase.auth.getSession()).data.session
+  // Protect admin routes
+  if (request.nextUrl.pathname.startsWith(baseUrls.ADMIN_BASE_URL)) {
+    const dbContext = await DatabaseContext()
+    const isAdmin = await dbContext.adminService.isUserAdmin()
+
+    if (!isAdmin) {
+      const url = request.nextUrl.clone()
+      url.pathname = baseUrls.LOGIN; url.searchParams.set("error", "Tried to access a protected route without the proper role")
+      return NextResponse.redirect(url)
+    }
+  }
   return await updateSession(request)
 }
 
