@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 
-import { signInSubmit, signUpSubmit } from "@/lib/services/login/login";
+import { signInSubmit, signUpSubmit } from "@/lib/services/login";
 import { useActionState, useState } from "react";
 import clsx from "clsx";
 import { useSearchParams } from "next/navigation";

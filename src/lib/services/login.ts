@@ -2,13 +2,13 @@
 
 import { baseUrls } from "@/configs";
 
-import { signInSchema } from "../../zod";
+import { signInSchema } from "../zod";
 import { treeifyError } from "zod";
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
-import { DatabaseContext } from "../database/database_context";
+import { DatabaseContext } from "./database/database_context";
 
 // Reference docs: https://supabase.com/docs/guides/auth/server-side/nextjs?queryGroups=router&router=app
 

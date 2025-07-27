@@ -4,11 +4,11 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
 import { baseUrls } from '@/configs'
-import { signOutSubmit } from '@/lib/services/login/login'
+import { signOutSubmit } from '@/lib/services/login'
 import { startTransition, useActionState } from 'react'
 import { Spinner } from './spinner'
 
-export default function Navbar() {
+export default function Navbar({ isAdmin }: { isAdmin: boolean }) {
     const pathname = usePathname()
 
     const [_, signOutAction, signOutPending] = useActionState(signOutSubmit, null)
@@ -42,14 +42,27 @@ export default function Navbar() {
                     Payment Info
                 </Link>
             </div>
-            <div className="flex md:flex-row-reverse md:w-1/6 text-means-red text-sm md:text-2xl md:items-center">
-                <button className={clsx("md:p-1 md:means-border cursor-pointer", {
-                    'text-means-pending cursor-auto': signOutPending
-                })} onClick={() => startTransition(signOutAction)}>
-                    Log Out
-                </button>
-                <div className={clsx({"hidden": !signOutPending})}>
-                    <Spinner />
+            <div className="flex flex-col-reverse md:flex-row-reverse md:w-1/6 md:justify-center text-means-red text-sm md:text-xl md:items-center">
+                <div>
+                    <button className={clsx("md:p-1 cursor-pointer", {
+                        'text-means-pending cursor-auto': signOutPending
+                    })} onClick={() => startTransition(signOutAction)}>
+                        Log Out
+                    </button>
+                    <div className={clsx({"hidden": !signOutPending})}>
+                        <Spinner />
+                    </div>
+                </div>
+                <div className='hidden md:block text-means-grey m-1'>|</div>
+                <div>
+                    <Link
+                        className={clsx("md:p-1 cursor-pointer", {
+                            'hidden': !isAdmin
+                        })}
+                        href={baseUrls.ADMIN_BASE_URL}
+                    >
+                        Admin View
+                    </Link>
                 </div>
             </div>
         </div>
