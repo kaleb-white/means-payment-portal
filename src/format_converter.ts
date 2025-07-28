@@ -1,4 +1,4 @@
-import { DateInYearQuarter } from "./lib/services/database/interfaces"
+import { DateInYearQuarter } from "./lib/services/database/schemas"
 
 /**
  * Converts floating point numbers to financial with two digits of precision using regex.

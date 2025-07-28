@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import clsx from "clsx";
 
 import { AnalyticsProperties, AnalyticsPropertiesAsArray } from "../_interfaces/types"
-import { ReportDataRow } from "@/lib/services/database/interfaces";
+import { ReportDataRow } from "@/lib/services/database/schemas";
 import { numberToFinancial } from "@/format_converter";
 import { Spinner } from "../_client_ui/spinner";
 

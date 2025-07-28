@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
-import { User, AuthServicesObj } from "../../database/interfaces";
+import { AuthServicesObj } from "../../database/interfaces";
+import { User } from "../../database/schemas"
 import { supabaseClient } from "../supabase_client";
 
 export class SupabaseAuthService implements AuthServicesObj {

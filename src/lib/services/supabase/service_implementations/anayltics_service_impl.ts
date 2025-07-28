@@ -1,7 +1,8 @@
 import { quartersToYearsAndQuarters } from "@/format_converter";
 import { DatabaseContext } from "../../database/database_context";
-import { AnalyticsServicesObj, DateInYearQuarter, QuarterlyReport, ReportDataRow, ReportDataRowUncast, User } from "../../database/interfaces";
+import { AnalyticsServicesObj, } from "../../database/interfaces";
 import { supabaseClient } from "../supabase_client";
+import { DateInYearQuarter, QuarterlyReport, ReportDataRow, ReportDataRowUncast, User } from "../../database/schemas"
 
 export class SupabaseAnayticsService implements AnalyticsServicesObj {
     static async getUserQuarterlyReports(quarters: number | DateInYearQuarter[], user?: User): Promise<ReportDataRow[] | Error> {

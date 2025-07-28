@@ -1,6 +1,6 @@
 'use client'
 import { analyticsConfig, graphConfig } from "@/configs"
-import { ReportDataRow } from "@/lib/services/database/interfaces"
+import { ReportDataRow } from "@/lib/services/database/schemas"
 
 import { AnalyticsProperties } from "../_interfaces/types"
 import Graph from "./graph"

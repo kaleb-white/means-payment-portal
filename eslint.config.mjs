@@ -22,6 +22,16 @@ const eslintConfig = [
         },
       ],
       "@typescript-eslint/no-empty-object-type": "off",
+      "@typescript-eslint/interface-name-prefix": "off",
+      "@typescript-eslint/explicit-member-accessibility": [
+        {
+          accessibility: "explicit",
+          overrides: {
+            constructors: "no-public",
+          },
+        },
+      ],
+      "@typescript-eslint/consistent-type-assertions": "error",
     },
   },
 ];
