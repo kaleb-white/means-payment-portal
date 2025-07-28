@@ -1,6 +1,6 @@
 import { quartersToYearsAndQuarters } from "@/format_converter";
 import { DatabaseContext } from "../../database/database_context";
-import { AnalyticsServicesObj, DateInYearQuarter, ReportDataRow, ReportDataRowUncast, User } from "../../database/interfaces";
+import { AnalyticsServicesObj, DateInYearQuarter, QuarterlyReport, ReportDataRow, ReportDataRowUncast, User } from "../../database/interfaces";
 import { supabaseClient } from "../supabase_client";
 
 export class SupabaseAnayticsService implements AnalyticsServicesObj {
@@ -58,15 +58,13 @@ export class SupabaseAnayticsService implements AnalyticsServicesObj {
             return reportDataCast.filter(creatorQuarterInfo => creatorQuarterInfo["Coupon Code"] === creatorCoupon)
         }).map(r => r![0])
 
-        if (!filteredByCouponCodeUncast ) return new Error("Fetching from database resulted in null.")
+        if (!filteredByCouponCodeUncast) return new Error("Fetching from database resulted in null.")
 
         // Cast to ReportDataRow
         const filteredByCouponCode = rdrUncastToCast(filteredByCouponCodeUncast)
 
         return filteredByCouponCode
     }
-
-
 
     static async getUserInProgressReport(user: User): Promise<ReportDataRow | Error> {
         'use server'
@@ -85,6 +83,39 @@ export class SupabaseAnayticsService implements AnalyticsServicesObj {
 
         return castData[0]
     }
+
+    static async getAllQuarterlyReports(quarters: number | DateInYearQuarter[] = 2): Promise<QuarterlyReport[] | Error> {
+        'use server'
+        // Check role
+        const dbContext = await DatabaseContext()
+        await dbContext.adminService.isUserAdmin()
+
+        // Create DateInYearQuarters if necessary
+        if (typeof(quarters) === 'number') {
+            quarters = quarters + 1 // TODO: idk get rid of current report it was stupid in the first place
+            quarters = quartersToYearsAndQuarters(quarters)
+            console.log(quarters)
+        }
+
+        // Create promises to exeute
+        const supabase = await supabaseClient()
+        const reportsAwaitable = quarters.map(yearAndQuarter => {
+            return supabase.from('quarterly_reports')
+                .select('year, quarter, report_data')
+                .eq('year', yearAndQuarter.year)
+                .eq('quarter', yearAndQuarter.quarter)
+        })
+
+        // Run all promises
+        const reports = (await Promise.all(reportsAwaitable))
+                        .filter(e => e && e?.data && e?.data?.length !== 0) // Removes missing reports
+
+        if (!reports) return new Error("No reports were returned by the database")
+
+        return reports.map(report => (report.data![0] as QuarterlyReport))
+    }
+
+
 }
 
 // Helper for getUserQuarterly reports to cast from ReportDataRowUncast to ReportDataRowCast

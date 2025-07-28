@@ -9,6 +9,12 @@ export interface User { // Modeled on (a partial of) supabase user obj: https://
     updated_at: string // Timestamps user was updated at
 }
 
+export interface QuarterlyReport {
+    year: number
+    quarter: number
+    report_data: ReportDataRowUncast[]
+}
+
 export interface ReportDataRowUncast {
     Period: string
     Refunds: string
@@ -120,12 +126,26 @@ export interface AnalyticsServices {
      * @returns Either a report or an Error.
      */
     getUserInProgressReport(user: User): Promise<ReportDataRow | Error>
+    /**
+     * -- ADMIN ROLE REQUIRED --
+     * Gets quarterly reports for all users.
+     * @param quarters Defaults to 2. Fetches that number of quarters, going backwards. Also works with a specific set of DateInYearQuarters.
+     */
+    getAllQuarterlyReports(quarters: number | DateInYearQuarter[]): Promise<QuarterlyReport[] | Error>
+
+    createQuarterlyReport(report: string): Promise<boolean | Error>
+    updateQuarterlyReport(quarter: DateInYearQuarter, report: string): Promise<boolean | Error>
+    deleteQuarterlyReport(quarter: DateInYearQuarter): Promise<boolean | Error>
 }
 
 export interface AdminServices {
     new(): AdminServicesObj
     /**
-     * Checks that sthe JWT property user_role is 'admin'.
+     * Checks that the JWT property user_role is 'admin'.
      */
     isUserAdmin(): Promise<boolean>
+    /**
+     * Logs a user out if they are not an admin.
+     */
+    checkAdminRole(): Promise<null>
 }
