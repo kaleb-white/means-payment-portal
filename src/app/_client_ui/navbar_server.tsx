@@ -5,6 +5,6 @@ import Navbar from "./navbar";
 
 export default async function NavbarServer() {
     return (
-        <Navbar isAdmin={await isAdmin()} />
+        <Navbar isAdmin={await isAdmin()}/>
     )
 }

@@ -5,17 +5,28 @@ import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
 import { baseUrls } from '@/configs'
 import { signOutSubmit } from '@/lib/services/login'
-import { startTransition, useActionState } from 'react'
+import { startTransition, useActionState, useEffect, useState } from 'react'
 import { Spinner } from './spinner'
 
 export default function Navbar({ isAdmin }: { isAdmin: boolean }) {
     const pathname = usePathname()
 
+    const [inAdmin, setInAdmin] = useState(false)
+    useEffect(() => {
+        if (pathname.startsWith(baseUrls.ADMIN_BASE_URL)) setInAdmin(true)
+    }, [pathname])
+
     const [_, signOutAction, signOutPending] = useActionState(signOutSubmit, null)
 
     return (
-        <div className="flex flex-col md:flex-row w-full text-xl md:text-3xl md:justify-center text-means-grey p-4">
-            <div className="contents md:flex md:flex-row md:w-5/6">
+        <div className={clsx("flex flex-col md:flex-row w-full text-xl md:text-3xl text-means-grey p-4", {
+            'md:justify-center': !inAdmin,
+            'md: justify-end': inAdmin
+        })}>
+            <div className={clsx("md:w-5/6", {
+                    'hidden': inAdmin,
+                    'contents md:flex md:flex-row': !inAdmin
+            })}>
                 <Link
                     className={
                         clsx('w-full flex justify-start md:justify-center',
@@ -44,7 +55,7 @@ export default function Navbar({ isAdmin }: { isAdmin: boolean }) {
             </div>
             <div className="flex flex-col-reverse md:flex-row-reverse md:w-1/6 md:justify-center text-means-red text-sm md:text-xl md:items-center">
                 <div>
-                    <button className={clsx("md:p-1 cursor-pointer", {
+                    <button className={clsx("md:p-1 cursor-pointer hover:text-means-red-hover", {
                         'text-means-pending cursor-auto': signOutPending
                     })} onClick={() => startTransition(signOutAction)}>
                         Log Out
@@ -56,12 +67,12 @@ export default function Navbar({ isAdmin }: { isAdmin: boolean }) {
                 <div className='hidden md:block text-means-grey m-1'>|</div>
                 <div>
                     <Link
-                        className={clsx("md:p-1 cursor-pointer", {
+                        className={clsx("md:p-1 cursor-pointer hover:text-means-red-hover", {
                             'hidden': !isAdmin
                         })}
-                        href={baseUrls.ADMIN_BASE_URL}
+                        href={inAdmin? baseUrls.ANALYTICS : baseUrls.ADMIN_BASE_URL}
                     >
-                        Admin View
+                        {inAdmin? 'User View' : 'Admin View'}
                     </Link>
                 </div>
             </div>

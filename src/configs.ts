@@ -3,8 +3,9 @@ export enum baseUrls {
     ANALYTICS='/home',
     PAYMENT_INFO='/home/payment-info',
     SIGN_OUT='/signout',
-    ADMIN_BASE_URL='/admin'
-
+    ADMIN_BASE_URL='/admin',
+    ADMIN_ANALYTICS='/admin/analytics',
+    ADMIN_PAYMENTS='/admin/payments'
 }
 
 export enum analyticsConfig {
