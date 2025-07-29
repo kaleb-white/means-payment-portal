@@ -1,10 +1,12 @@
 import { quartersToYearsAndQuarters } from "@/format_converter";
 import { DatabaseContext } from "../../database/database_context";
-import { AnalyticsServicesObj, } from "../../database/interfaces";
+import { AnalyticsServices, staticImplements } from "../../database/interfaces";
 import { supabaseClient } from "../supabase_client";
 import { DateInYearQuarter, QuarterlyReport, ReportDataRow, ReportDataRowUncast, User } from "../../database/schemas"
+import { dbTableNames } from "@/configs";
 
-export class SupabaseAnayticsService implements AnalyticsServicesObj {
+@staticImplements<AnalyticsServices>()
+export class SupabaseAnayticsService {
     static async getUserQuarterlyReports(quarters: number | DateInYearQuarter[], user?: User): Promise<ReportDataRow[] | Error> {
         'use server'
         const supabase = await supabaseClient()
@@ -89,13 +91,12 @@ export class SupabaseAnayticsService implements AnalyticsServicesObj {
         'use server'
         // Check role
         const dbContext = await DatabaseContext()
-        await dbContext.adminService.isUserAdmin()
+        if (!await dbContext.adminService.isUserAdmin()) return new Error("Server action called by non admin")
 
         // Create DateInYearQuarters if necessary
         if (typeof(quarters) === 'number') {
             quarters = quarters + 1 // TODO: idk get rid of current report it was stupid in the first place
             quarters = quartersToYearsAndQuarters(quarters)
-            console.log(quarters)
         }
 
         // Create promises to exeute
@@ -116,7 +117,96 @@ export class SupabaseAnayticsService implements AnalyticsServicesObj {
         return reports.map(report => (report.data![0] as QuarterlyReport))
     }
 
+    static async createQuarterlyReport(report: QuarterlyReport): Promise<boolean | Error> {
+        'use server'
+        // Check role
+        const dbContext = await DatabaseContext()
+        if (!await dbContext.adminService.isUserAdmin()) return new Error("Server action called by non admin")
 
+        // Set up supabase
+        const supabase = await supabaseClient()
+        const tableName = process.env.IS_PROD ? dbTableNames.quarterlyReports : dbTableNames.testQuarterlyReports
+
+        // Check if the report is duplicate
+        const match = await supabase.from(tableName)
+            .select('year, quarter')
+            .eq('year', report.year)
+            .eq('quarter', report.quarter)
+        if (match.count && match.count > 0) return new Error("Report exists for given year and quarter")
+
+        // Insert the new report
+        const { data, error } = await supabase
+            .from(tableName)
+            .insert([report])
+            .select()
+
+        // If error, return it
+        if (error) return error
+        if (!data) return new Error("No data was inserted as supabase returned no data")
+
+        return true
+    }
+
+    static async updateQuarterlyReport(report: QuarterlyReport): Promise<boolean | Error> {
+        'use server'
+        // Check role
+        const dbContext = await DatabaseContext()
+        if (!await dbContext.adminService.isUserAdmin()) return new Error("Server action called by non admin")
+
+        // Set up supabase
+        const supabase = await supabaseClient()
+        const tableName = process.env.IS_PROD ? dbTableNames.quarterlyReports : dbTableNames.testQuarterlyReports
+
+        // Make sure match exists
+        const match = await supabase.from(tableName)
+            .select('year, quarter')
+            .eq('year', report.year)
+            .eq('quarter', report.quarter)
+        if (!match.count || match.count !== 1) return new Error(match.count === 0 ? "No matching report was found" : "Multiple matching reports were found")
+
+        // Perform update
+        const { data, error } = await supabase
+            .from(tableName)
+            .update({ 'report_data': report.report_data })
+            .eq('year', report.year)
+            .eq('quarter', report.quarter)
+
+        // If error, return it
+        if (error) return error
+        if (!data) return new Error("No data was updated as supabase returned no data")
+
+        return true
+    }
+
+    static async deleteQuarterlyReport(quarter: DateInYearQuarter): Promise<boolean | Error> {
+        'use server'
+        // Check role
+        const dbContext = await DatabaseContext()
+        if (!await dbContext.adminService.isUserAdmin()) return new Error("Server action called by non admin")
+
+        // Set up supabase
+        const supabase = await supabaseClient()
+        const tableName = process.env.IS_PROD ? dbTableNames.quarterlyReports : dbTableNames.testQuarterlyReports
+
+        // Make sure match exists
+        const match = await supabase.from(tableName)
+            .select('year, quarter')
+            .eq('year', quarter.year)
+            .eq('quarter', quarter.quarter)
+        if (!match.count || match.count !== 1) return new Error(match.count === 0 ? "No matching report was found" : "Multiple matching reports were found")
+
+        // Perform delete
+        const { error } = await supabase
+            .from(tableName)
+            .delete()
+            .eq('year', quarter.year)
+            .eq('quarter', quarter.quarter)
+
+        // If error, return it
+        if (error) return error
+
+        return true
+    }
 }
 
 // Helper for getUserQuarterly reports to cast from ReportDataRowUncast to ReportDataRowCast

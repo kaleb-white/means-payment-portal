@@ -17,3 +17,8 @@ export enum graphConfig {
     graphHeight=300,
     graphWidthMax=1000
 }
+
+export enum dbTableNames {
+    testQuarterlyReports='quarterly_reports',
+    quarterlyReports='quarterly_reports'
+}

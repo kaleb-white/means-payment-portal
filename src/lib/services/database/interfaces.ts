@@ -80,14 +80,28 @@ export interface AnalyticsServices {
      */
     getUserInProgressReport(user: User): Promise<ReportDataRow | Error>
     /**
-     * -- ADMIN ROLE REQUIRED --
+     * ** ADMIN ROLE REQUIRED **
      * Gets quarterly reports for all users.
      * @param quarters Defaults to 2. Fetches that number of quarters, going backwards. Also works with a specific set of DateInYearQuarters.
      */
     getAllQuarterlyReports(quarters: number | DateInYearQuarter[]): Promise<QuarterlyReport[] | Error>
-
-    createQuarterlyReport(report: string): Promise<boolean | Error>
-    updateQuarterlyReport(quarter: DateInYearQuarter, report: string): Promise<boolean | Error>
+    /**
+     * ** ADMIN ROLE REQUIRED **
+     * Creates a new quarterly report. Returns an error if db does or if report is duplicate.
+     * @param report A QuarterlyReport object. Does not perform validation!
+     */
+    createQuarterlyReport(report: QuarterlyReport): Promise<boolean | Error>
+    /**
+     * ** ADMIN ROLE REQUIRED **
+     * Updates a quarterly report. Current implementation just replaces jsonb value in db.
+     * @param report A QuarterlyReport object. Does not perform validation!
+     */
+    updateQuarterlyReport(report: QuarterlyReport): Promise<boolean | Error>
+    /**
+     * ** ADMIN ROLE REQUIRED **
+     * Deletes a quarterly report.
+     * @param quarter A DateInYearQuarter object. Returns an error if multiple or no matching rows exist.
+     */
     deleteQuarterlyReport(quarter: DateInYearQuarter): Promise<boolean | Error>
 }
 
@@ -101,4 +115,12 @@ export interface AdminServices {
      * Logs a user out if they are not an admin.
      */
     checkAdminRole(): Promise<null>
+}
+
+/**
+ * Credit to https://stackoverflow.com/questions/13955157/how-to-define-static-property-in-typescript-interface
+ * Use this to get a warning if an interface is not fulfilled
+ */
+export function staticImplements<T>() {
+    return <U extends T>(constructor: U) => {constructor};
 }
