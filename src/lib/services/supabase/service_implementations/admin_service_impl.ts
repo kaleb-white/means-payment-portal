@@ -1,5 +1,5 @@
 import { jwtDecode } from "jwt-decode";
-import { AdminServicesObj } from "../../database/interfaces";
+import { AdminServicesObj } from "../../../database/interfaces";
 import { supabaseClient } from "../supabase_client";
 import { redirect } from "next/navigation";
 import { baseUrls } from "@/configs";

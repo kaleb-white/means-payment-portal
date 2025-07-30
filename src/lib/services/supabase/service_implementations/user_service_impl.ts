@@ -1,5 +1,5 @@
-import { UserServicesObj } from "../../database/interfaces";
-import { User } from "../../database/schemas"
+import { UserServicesObj } from "../../../database/interfaces";
+import { User } from "../../../database/schemas"
 import { supabaseClient } from "../supabase_client";
 
 export class SupabaseUserService implements UserServicesObj  {

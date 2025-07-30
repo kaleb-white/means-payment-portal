@@ -1,8 +1,8 @@
 'use client'
 import { analyticsConfig, graphConfig } from "@/configs"
-import { ReportDataRow } from "@/lib/services/database/schemas"
+import { ReportDataRow } from "@/lib/database/schemas"
 
-import { AnalyticsProperties } from "../_interfaces/types"
+import { AnalyticsProperties } from "../_client_interfaces/types"
 import Graph from "./graph"
 import Controls from "./controls"
 
@@ -51,7 +51,7 @@ export default function AnalyticsContainer({
             // If there aren't any to fetch, skip the fetching (ie, quarter amt decreased)
             if (quartersToFetch.length > 0) {
                 // Fetch the quarters
-                const response = await fetch('api/get-quarterly-reports', {
+                const response = await fetch('api/analytics/get-user-quarterly-reports', {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',

@@ -1,7 +1,7 @@
 'use client'
 
-import { ReportDataRow } from "@/lib/services/database/schemas"
-import { AnalyticsProperties } from "../_interfaces/types"
+import { ReportDataRow } from "@/lib/database/schemas"
+import { AnalyticsProperties } from "../_client_interfaces/types"
 
 import * as d3 from "d3"
 import { useEffect, useRef} from "react"

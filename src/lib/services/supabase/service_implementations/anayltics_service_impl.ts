@@ -1,8 +1,8 @@
 import { quartersToYearsAndQuarters } from "@/format_converter";
-import { DatabaseContext } from "../../database/database_context";
-import { AnalyticsServices, staticImplements } from "../../database/interfaces";
+import DatabaseContext from "../../../database/database_context";
+import { AnalyticsServices, staticImplements } from "../../../database/interfaces";
 import { supabaseClient } from "../supabase_client";
-import { DateInYearQuarter, QuarterlyReport, ReportDataRow, ReportDataRowUncast, User } from "../../database/schemas"
+import { DateInYearQuarter, QuarterlyReport, ReportDataRow, ReportDataRowUncast, User } from "../../../database/schemas"
 import { dbTableNames } from "@/configs";
 
 @staticImplements<AnalyticsServices>()
@@ -95,7 +95,7 @@ export class SupabaseAnayticsService {
 
         // Create DateInYearQuarters if necessary
         if (typeof(quarters) === 'number') {
-            quarters = quarters + 1 // TODO: idk get rid of current report it was stupid in the first place
+            quarters = quarters + 1 // TODO: idk, eventually should get rid of current report it was stupid in the first place
             quarters = quartersToYearsAndQuarters(quarters)
         }
 

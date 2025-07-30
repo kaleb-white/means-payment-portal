@@ -1,4 +1,4 @@
-import { DatabaseContext } from "@/lib/services/database/database_context";
+import DatabaseContext from "@/lib/database/database_context";
 import { dateInYearQuarterArray } from "@/lib/zod";
 
 import { NextRequest } from "next/server";

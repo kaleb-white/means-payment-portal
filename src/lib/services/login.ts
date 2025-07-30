@@ -8,7 +8,7 @@ import { treeifyError } from "zod";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
-import { DatabaseContext } from "./database/database_context";
+import DatabaseContext from "../database/database_context";
 
 // Reference docs: https://supabase.com/docs/guides/auth/server-side/nextjs?queryGroups=router&router=app
 
@@ -48,9 +48,9 @@ export async function signUpSubmit(_previousState: unknown, formData: FormData) 
     const error = await (await DatabaseContext()).authService.signUp(data.email, data.password)
 
     // On error redirect with error message in url params
-    if (error instanceof Error) {revalidatePath(baseUrls.LOGIN); redirect(`${baseUrls.LOGIN}?error=${error.message}`)}
+    if (error instanceof Error) {revalidatePath(baseUrls.LOGIN); redirect(`${baseUrls.LOGIN}?error=${error.message}&signUp=1`)}
 
-    redirect(baseUrls.ANALYTICS)
+    redirect(baseUrls.ANALYTICS) // This needs changed since eamil authentication is required
 }
 
 export async function signOutSubmit() {

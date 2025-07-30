@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { updateSession } from './lib/services/supabase/middleware'
-import { DatabaseContext } from './lib/services/database/database_context'
+import DatabaseContext from './lib/database/database_context'
 import { baseUrls } from './configs'
 
 export async function middleware(request: NextRequest) {

@@ -64,7 +64,7 @@ export default function Navbar({ isAdmin }: { isAdmin: boolean }) {
                         <Spinner />
                     </div>
                 </div>
-                <div className='hidden md:block text-means-grey m-1'>|</div>
+                <div className={clsx('hidden text-means-grey m-1', {'md:hidden': !isAdmin, 'md:block': isAdmin})}>|</div>
                 <div>
                     <Link
                         className={clsx("md:p-1 cursor-pointer hover:text-means-red-hover", {

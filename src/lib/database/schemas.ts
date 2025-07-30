@@ -41,7 +41,6 @@ export interface ReportDataRow {
     "Total (Net Revenue - Refund)": number
 }
 
-// Has corresponding Zod schema
 export interface DateInYearQuarter {
     year: string,
     quarter: string
