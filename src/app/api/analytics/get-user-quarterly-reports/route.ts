@@ -13,11 +13,11 @@ export async function POST(request: NextRequest) {
     } catch {
         return new Response("", {status: 400, statusText: 'Error while parsing body data'})
     }
-    if (!parseResult.success) return new Response('', {status: 400, statusText:'Zod parsing failed'})
+    if (!parseResult.success) return new Response('', {status: 400, statusText:'Unable to parse body data'})
 
 
     const dbContext = await DatabaseContext()
     const quarterlyReports = await dbContext.analyticsService.getUserQuarterlyReports(parseResult.data)
 
-    return new Response(JSON.stringify(quarterlyReports), {status: 200, statusText: "Succesffully got reports"})
+    return new Response(JSON.stringify(quarterlyReports), {status: 200, statusText: "Succesfully got reports"})
 }
