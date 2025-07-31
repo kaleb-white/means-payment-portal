@@ -87,6 +87,11 @@ export interface AnalyticsServices {
     getAllQuarterlyReports(quarters: number | DateInYearQuarter[]): Promise<QuarterlyReport[] | Error>
     /**
      * ** ADMIN ROLE REQUIRED **
+     * Gets the length of the quarterly reports table.
+     */
+    getQuarterlyReportsLength(): Promise<number | Error>
+    /**
+     * ** ADMIN ROLE REQUIRED **
      * Creates a new quarterly report. Returns an error if db does or if report is duplicate.
      * @param report A QuarterlyReport object. Does not perform validation!
      */

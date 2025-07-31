@@ -15,6 +15,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url)
     }
   }
+
   return await updateSession(request)
 }
 

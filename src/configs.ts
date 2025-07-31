@@ -19,6 +19,6 @@ export enum graphConfig {
 }
 
 export enum dbTableNames {
-    testQuarterlyReports='quarterly_reports',
+    testQuarterlyReports='test_quarterly_reports',
     quarterlyReports='quarterly_reports'
 }

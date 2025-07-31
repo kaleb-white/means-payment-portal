@@ -26,6 +26,15 @@ export function numberToFinancial(num: string): string {
 }
 
 /**
+ * Converts financial strings to numbers.
+ * @param financial A string in financial format, ie $1,234,567.00
+ * @returns The numerical equivalent
+ */
+export function financialToNumeric(financial: string) {
+    return Number(financial.slice(1, ).replace(",", ""))
+}
+
+/**
  * Given a string in the format yyyyQn, ie 2025Q1, converts it into a TS Date object.
  * Uses the YYYY-MM overload on the Date constructor: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date#date_time_string_format
  * @param quarter

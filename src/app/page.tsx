@@ -6,6 +6,7 @@ import { signInSubmit, signUpSubmit } from "@/lib/services/login";
 import { useActionState, useEffect, useState } from "react";
 import clsx from "clsx";
 import { useSearchParams } from "next/navigation";
+import Error from "./_client_ui/error";
 
 function Errors({fieldHasText, errors} : {fieldHasText: boolean | undefined, errors: string[] | undefined}){
   return (
@@ -47,10 +48,10 @@ export default function Login() {
 
       <Image src="/meanstv_logo.png" alt="Means TV" width={662} height={100} className="p-6 mx-auto"/>
 
-      <div className={clsx('w-full mb-4 mx-auto text-center text-sm overflow-clip text-means-red-error', {'hidden': !error})}>
-        Encountered an error: {error?.endsWith('.')? error.slice(0, -1) : error}.{extendedErrorMessage} If the issue persists, please contact means.
-        Please sign in again.
-      </div>
+      <Error
+        text={`Encountered an error: ${error?.endsWith('.')? error.slice(0, -1) : error}.${extendedErrorMessage} If the issue persists, please contact means. Please sign in again.`}
+        hidden={!error}
+      />
 
       <div className="p-4 md:p-6 means-border rounded-sm md:rounded-lg w-full md:w-1/2 mx-auto">
 

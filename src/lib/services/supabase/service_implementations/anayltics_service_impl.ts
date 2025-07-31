@@ -1,9 +1,9 @@
-import { quartersToYearsAndQuarters } from "@/format_converter";
+import { quartersToYearsAndQuarters, financialToNumeric } from "@/format_converter";
 import DatabaseContext from "../../../database/database_context";
 import { AnalyticsServices, staticImplements } from "../../../database/interfaces";
 import { supabaseClient } from "../supabase_client";
 import { DateInYearQuarter, QuarterlyReport, ReportDataRow, ReportDataRowUncast, User } from "../../../database/schemas"
-import { dbTableNames } from "@/configs";
+import { baseUrls, dbTableNames } from "@/configs";
 
 @staticImplements<AnalyticsServices>()
 export class SupabaseAnayticsService {
@@ -117,6 +117,18 @@ export class SupabaseAnayticsService {
         return reports.map(report => (report.data![0] as QuarterlyReport))
     }
 
+    static async getQuarterlyReportsLength(): Promise<number | Error> {
+        'use server'
+        // Check role
+        const dbContext = await DatabaseContext()
+        if (!await dbContext.adminService.isUserAdmin()) return new Error("Server action called by non admin")
+
+        const supabase = await supabaseClient()
+        const res = await supabase.rpc('get_num_reports')
+        if (res.error) return res.error
+        return res.data
+    }
+
     static async createQuarterlyReport(report: QuarterlyReport): Promise<boolean | Error> {
         'use server'
         // Check role
@@ -211,10 +223,6 @@ export class SupabaseAnayticsService {
 
 // Helper for getUserQuarterly reports to cast from ReportDataRowUncast to ReportDataRowCast
 function rdrUncastToCast(rdrUncast: ReportDataRowUncast[]): ReportDataRow[] {
-    function financialToNumeric(financial: string) {
-        return Number(financial.slice(1, ).replace(",", ""))
-    }
-
     return rdrUncast.map(uncast => {
         return {
             Period: uncast.Period,

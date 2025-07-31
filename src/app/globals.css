@@ -16,6 +16,16 @@
         border-radius: 4px;
     }
 
+    .means-border-no-radius {
+        border-width: 0.8px;
+        border-color: rgb(77, 77, 77);
+    }
+
+    .means-border-bottom {
+        border-bottom-width: 0.8px;
+        border-bottom-color: rgb(77, 77, 77);
+    }
+
     .means-underline {
         text-underline-offset: 0.5rem;
         text-decoration-line: underline;
