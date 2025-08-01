@@ -41,7 +41,19 @@ export interface ReportDataRow {
     "Total (Net Revenue - Refund)": number
 }
 
+
+
 export interface DateInYearQuarter {
     year: string,
     quarter: string
+}
+
+export type DateInYearQuarterType = {
+    year: string,
+    quarter: string
+}
+
+export interface Range {
+    start: number,
+    stop: number
 }

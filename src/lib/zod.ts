@@ -32,3 +32,8 @@ export const QuarterlyReportSchema = z.object({
     quarter: z.number(),
     report_data: z.array(ReportDataRowUncastSchema)
 })
+
+export const RangeSchema = z.object({
+    start: z.number(),
+    stop: z.number()
+})

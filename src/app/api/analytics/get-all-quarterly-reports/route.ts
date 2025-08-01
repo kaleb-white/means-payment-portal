@@ -3,7 +3,7 @@ import { dateInYearQuarterArray } from "@/lib/zod";
 import { NextRequest } from "next/server";
 import * as z from "zod"
 
-export async function GET(request: NextRequest) {
+export async function POST(request: NextRequest) {
     const body = await request.json()
     if (!body) return new Response('', {status: 400, statusText: 'Body required'})
 
@@ -20,5 +20,5 @@ export async function GET(request: NextRequest) {
 
     if (serviceResponse instanceof Error) return new Response('', {status: 400, statusText: serviceResponse.message})
 
-    return new Response('', {status: 200, statusText: 'Report created succesfully'})
+    return new Response(JSON.stringify(serviceResponse), {status: 200, statusText: 'Reports fetched succesfully'})
 }

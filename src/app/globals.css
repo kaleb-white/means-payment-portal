@@ -7,6 +7,9 @@
     --color-means-grey-hover: oklch(0.8792 0 0 / 76%);
     --color-means-red-error: oklch(63.7% 0.237 25.331);
     --color-means-pending: oklch(70.7% 0.022 261.325);
+    --color-means-bg-hover: oklch(21% 0.006 285.885);
+    --color-means-success: oklch(0.6271 0.1699 149.21);
+    --text-2xs: 10px;
 }
 
 @layer components {
@@ -26,10 +29,21 @@
         border-bottom-color: rgb(77, 77, 77);
     }
 
+    .means-border-top {
+        border-top-width: 0.8px;
+        border-top: rgb(77, 77, 77);
+    }
+
     .means-underline {
         text-underline-offset: 0.5rem;
         text-decoration-line: underline;
         text-decoration-color: var(--color-means-red);
+    }
+
+    .means-input {
+        color: oklch(0.6565 0.2358 12.27);
+        text-decoration-color: oklch(0.6565 0.2358 12.27);
+        @apply text-center underline decoration-dashed
     }
 
     /* Graph styles */
@@ -53,4 +67,17 @@
         color: white;
         @apply text-[7px] md:text-sm;
     }
+}
+
+/* Disable arrows for input type text */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
 }

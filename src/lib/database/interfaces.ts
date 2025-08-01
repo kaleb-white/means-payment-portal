@@ -87,6 +87,13 @@ export interface AnalyticsServices {
     getAllQuarterlyReports(quarters: number | DateInYearQuarter[]): Promise<QuarterlyReport[] | Error>
     /**
      * ** ADMIN ROLE REQUIRED **
+     * Fetches quarterly reports in the range start to end, inclusive.
+     * @param start The record # to start with.
+     * @param end The record # to end with.
+     */
+    getQuarterlyReportsRange(start: number, end: number): Promise<QuarterlyReport[] | Error>
+    /**
+     * ** ADMIN ROLE REQUIRED **
      * Gets the length of the quarterly reports table.
      */
     getQuarterlyReportsLength(): Promise<number | Error>

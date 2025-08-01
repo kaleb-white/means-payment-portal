@@ -3,13 +3,14 @@ import DatabaseContext from "../../../database/database_context";
 import { AnalyticsServices, staticImplements } from "../../../database/interfaces";
 import { supabaseClient } from "../supabase_client";
 import { DateInYearQuarter, QuarterlyReport, ReportDataRow, ReportDataRowUncast, User } from "../../../database/schemas"
-import { baseUrls, dbTableNames } from "@/configs";
+import { dbTableNames } from "@/configs";
 
 @staticImplements<AnalyticsServices>()
 export class SupabaseAnayticsService {
     static async getUserQuarterlyReports(quarters: number | DateInYearQuarter[], user?: User): Promise<ReportDataRow[] | Error> {
         'use server'
         const supabase = await supabaseClient()
+        const tableName = (process.env.IS_PROD === '1') ? dbTableNames.quarterlyReports : dbTableNames.testQuarterlyReports
         const dbContext = await DatabaseContext()
 
         // If no user passed, get user from session
@@ -37,7 +38,7 @@ export class SupabaseAnayticsService {
 
         // Create promises to execute for each possible report
         const reportsAwaitable = reportsToFetch.map(yearAndQuarter => {
-            return supabase.from('quarterly_reports')
+            return supabase.from(tableName)
                     .select('year, quarter, report_data')
                     .eq('year', yearAndQuarter.year)
                     .eq('quarter', yearAndQuarter.quarter)
@@ -101,8 +102,9 @@ export class SupabaseAnayticsService {
 
         // Create promises to exeute
         const supabase = await supabaseClient()
+        const tableName = (process.env.IS_PROD === '1') ? dbTableNames.quarterlyReports : dbTableNames.testQuarterlyReports
         const reportsAwaitable = quarters.map(yearAndQuarter => {
-            return supabase.from('quarterly_reports')
+            return supabase.from(tableName)
                 .select('year, quarter, report_data')
                 .eq('year', yearAndQuarter.year)
                 .eq('quarter', yearAndQuarter.quarter)
@@ -115,6 +117,27 @@ export class SupabaseAnayticsService {
         if (!reports) return new Error("No reports were returned by the database")
 
         return reports.map(report => (report.data![0] as QuarterlyReport))
+    }
+
+    static async getQuarterlyReportsRange(start: number, end: number): Promise<QuarterlyReport[] | Error> {
+        'use server'
+        // Check role
+        const dbContext = await DatabaseContext()
+        if (!await dbContext.adminService.isUserAdmin()) return new Error("Server action called by non admin")
+
+        // Create promises to exeute
+        const supabase = await supabaseClient()
+        const tableName = (process.env.IS_PROD === '1')? dbTableNames.quarterlyReports : dbTableNames.testQuarterlyReports
+        const reportsAwaitable = supabase.from(tableName)
+            .select('year, quarter, report_data')
+            .range(start, end)
+
+        // Run promise
+        const reports = await reportsAwaitable
+
+        if (!reports) return new Error("No reports were returned by the database")
+
+        return reports.data as QuarterlyReport[]
     }
 
     static async getQuarterlyReportsLength(): Promise<number | Error> {
@@ -137,7 +160,7 @@ export class SupabaseAnayticsService {
 
         // Set up supabase
         const supabase = await supabaseClient()
-        const tableName = process.env.IS_PROD ? dbTableNames.quarterlyReports : dbTableNames.testQuarterlyReports
+        const tableName = (process.env.IS_PROD === '1') ? dbTableNames.quarterlyReports : dbTableNames.testQuarterlyReports
 
         // Check if the report is duplicate
         const match = await supabase.from(tableName)
@@ -167,14 +190,15 @@ export class SupabaseAnayticsService {
 
         // Set up supabase
         const supabase = await supabaseClient()
-        const tableName = process.env.IS_PROD ? dbTableNames.quarterlyReports : dbTableNames.testQuarterlyReports
+        const tableName = (process.env.IS_PROD === '1') ? dbTableNames.quarterlyReports : dbTableNames.testQuarterlyReports
 
         // Make sure match exists
         const match = await supabase.from(tableName)
             .select('year, quarter')
             .eq('year', report.year)
             .eq('quarter', report.quarter)
-        if (!match.count || match.count !== 1) return new Error(match.count === 0 ? "No matching report was found" : "Multiple matching reports were found")
+        if (!match.data) return new Error("No data was returned")
+        if (match.data.length !== 1) return new Error(match.data.length === 0 ? "No matching report was found" : "Multiple matching reports were found")
 
         // Perform update
         const { data, error } = await supabase
@@ -182,10 +206,11 @@ export class SupabaseAnayticsService {
             .update({ 'report_data': report.report_data })
             .eq('year', report.year)
             .eq('quarter', report.quarter)
+            .select()
 
         // If error, return it
         if (error) return error
-        if (!data) return new Error("No data was updated as supabase returned no data")
+        if (!data) return new Error("No data was updated as database returned no data")
 
         return true
     }
@@ -198,7 +223,7 @@ export class SupabaseAnayticsService {
 
         // Set up supabase
         const supabase = await supabaseClient()
-        const tableName = process.env.IS_PROD ? dbTableNames.quarterlyReports : dbTableNames.testQuarterlyReports
+        const tableName = (process.env.IS_PROD === '1') ? dbTableNames.quarterlyReports : dbTableNames.testQuarterlyReports
 
         // Make sure match exists
         const match = await supabase.from(tableName)
