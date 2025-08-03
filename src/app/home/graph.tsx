@@ -58,7 +58,6 @@ export default function Graph({
         // Remove all bars and text before rerendering
         svg.selectAll('rect, .graph-text').remove()
 
-
         // Add data-dependent svg elements
         svg.selectAll("rect.bar")
         .data(reportData)
@@ -74,7 +73,7 @@ export default function Graph({
                 - height = innerHeight - y(d[property]), starts at 0 for transition purposes
 
                 - textX = textRectX + textPadding
-                - textY = textRectY + (does this bar reach the top of the svg? + 2 * textPadding : -textPadding)
+                - textY = textRectY + (does this bar reach the top of the svg + textHeightMargin? + 2 * textPadding : -textPadding), starts at innerHeight not textRectY for transition purposes
                 */
                 // rect
                 const bar = enter.append("rect")
@@ -93,8 +92,8 @@ export default function Graph({
                         + textPaddingX
                     )
                     .attr("y",
-                        d => y(d[property]) - rectPadding +
-                        (y(d[property]) - rectPadding <= 0? 2 * textPaddingY : (-textPaddingY))
+                        d => innerHeight +
+                        (y(d[property]) - rectPadding <= 15? 2 * textPaddingY : (-textPaddingY))
                     )
 
                 return bar
@@ -118,8 +117,9 @@ export default function Graph({
             )
             .attr("y",
                 d => y((d as ReportDataRow)[property]) - rectPadding +
-                (y((d as ReportDataRow)[property]) - rectPadding <= 0? 2 * textPaddingY : (-textPaddingY))
+                (y((d as ReportDataRow)[property]) - rectPadding <= 15? 2 * textPaddingY : (-textPaddingY))
             )
+            .duration(750)
 
         // Remove old axes
         svg.selectAll('.x-axis, .y-axis, .axis-group').remove()
