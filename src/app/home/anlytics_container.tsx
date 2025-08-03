@@ -83,9 +83,16 @@ export default function AnalyticsContainer({
     )
 
     // Call our action on hydration
+    const timeoutId = useRef<number | null>(null)
     useEffect (() => {
+        // Create our state as a function
         async function transitionReportData() {startTransition(action)}
-        transitionReportData()
+
+        // Clear existing timeouts
+        if (timeoutId.current) clearTimeout(timeoutId.current)
+
+        // Create new timeout
+        timeoutId.current = window.setTimeout(() => transitionReportData(), 500)
     }, [quarters, action])
 
     if (reportData instanceof Error) {
