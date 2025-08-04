@@ -19,6 +19,12 @@
         border-radius: 4px;
     }
 
+    .means-border-red {
+        border-width: 0.8px;
+        border-color: oklch(0.6565 0.2358 12.27);
+        border-radius: 4px;
+    }
+
     .means-border-no-radius {
         border-width: 0.8px;
         border-color: rgb(77, 77, 77);
@@ -27,6 +33,11 @@
     .means-border-bottom {
         border-bottom-width: 0.8px;
         border-bottom-color: rgb(77, 77, 77);
+    }
+
+    .means-border-bottom-red {
+        border-bottom-width: 0.8px;
+        border-bottom-color: oklch(0.6565 0.2358 12.27);
     }
 
     .means-border-top {
