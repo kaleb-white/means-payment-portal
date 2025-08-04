@@ -373,7 +373,6 @@ function EditableReportDatapoint({ property, propertyValue, couponCode }: { prop
 
     // OnChange function
     function editQuarterOnChange(e: ChangeEvent<HTMLInputElement>) {
-
         changeQuarter(quarter => {
             // Create mutable object copy
             let newQuarter = {...quarter}

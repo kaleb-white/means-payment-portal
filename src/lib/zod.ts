@@ -14,17 +14,19 @@ export const dateInYearQuarterArray = z.array(
     DateInYearQuarterSchema
 )
 
+const financial = z.string().regex(/^\$((([0-9]{1,3},)?([0-9]{3},)*[0-9]{3}|[0-9]{1,3})(\.[0-9]{2})?)$/)
+
 export const ReportDataRowUncastSchema = z.object({
     Period: z.string(),
-    Refunds: z.string(),
+    Refunds: financial,
     "Coupon Code": z.string(),
-    "Net Revenue": z.string(),
-    "Stripe Fees": z.string(),
-    "1/3 of Total": z.string(),
-    "Uscreen Fees": z.string(),
-    "Gross Revenue": z.string(),
+    "Net Revenue": financial,
+    "Stripe Fees": financial,
+    "1/3 of Total": financial,
+    "Uscreen Fees": financial,
+    "Gross Revenue": financial,
     "Number of Subscribers": z.number(),
-    "Total (Net Revenue - Refund)": z.string()
+    "Total (Net Revenue - Refund)": financial
 })
 
 export const QuarterlyReportSchema = z.object({
