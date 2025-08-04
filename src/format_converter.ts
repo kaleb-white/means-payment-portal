@@ -89,3 +89,12 @@ export function quartersToYearsAndQuarters(
     }
     return returnArray
 }
+
+/**
+ * Checks if a string is in financial format, ie $123,456.00
+ * @param test The string to test.
+ * @returns True on match, false on no match.
+ */
+export function isValidFinancial(test: string): boolean {
+    return /^\$((([0-9]{1,3},)?([0-9]{3},)*[0-9]{3}|[0-9]{1,3})(\.[0-9]{2})?)$/.test(test);
+}

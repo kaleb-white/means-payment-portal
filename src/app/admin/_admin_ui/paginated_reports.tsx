@@ -4,10 +4,10 @@ import { AnalyticsProperties, AnalyticsPropertiesAsArray, isNumericPropertyUncas
 import Error from "@/app/_client_ui/error";
 import { Check, Spinner } from "@/app/_client_ui/spinner";
 import useControlOpen from "@/app/_custom_hooks/use_control_open";
-import { financialToNumeric, numberToFinancial } from "@/format_converter";
+import { financialToNumeric, isValidFinancial, numberToFinancial } from "@/format_converter";
 import { QuarterlyReport, Range, ReportDataRowUncast } from "@/lib/database/schemas";
 import clsx from "clsx";
-import { createContext, Dispatch, RefObject, SetStateAction, startTransition, use, useActionState, useContext, useEffect, useRef, useState } from "react";
+import { ChangeEvent, createContext, Dispatch, RefObject, SetStateAction, startTransition, use, useActionState, useContext, useEffect, useRef, useState, FocusEvent } from "react";
 import * as l from "lodash";
 import Controls from "@/app/_client_ui/pagination_controls";
 
@@ -358,6 +358,9 @@ function EditableReportDatapoint({ property, propertyValue, couponCode }: { prop
     )
     const { changeQuarter } = context
 
+    // Financial field input valid check
+    const [validFinancial, setIsValidFinancial] = useState(true)
+
     // Check for unsaved changes
     const [unsavedChanges, setUnsavedChanges] = useState(false)
     const reports = useContext(Quarters)
@@ -367,6 +370,42 @@ function EditableReportDatapoint({ property, propertyValue, couponCode }: { prop
         const curr = filterReportByCouponCode(reports.current, couponCode)[property]
         setUnsavedChanges(initial !== curr)
     }, [reports])
+
+    // OnChange function
+    function editQuarterOnChange(e: ChangeEvent<HTMLInputElement>) {
+
+        changeQuarter(quarter => {
+            // Create mutable object copy
+            let newQuarter = {...quarter}
+
+            // Check if field is numeric or financial
+            if (isNumericPropertyUncast(property)) {
+                (filterReportByCouponCode(newQuarter, couponCode)[property] as ReportDataRowUncast['Number of Subscribers']) = Number(e.target.value)
+            }
+            // If not numeric
+            else {
+                (filterReportByCouponCode(newQuarter, couponCode)[property] as Exclude<ReportDataRowUncast[AnalyticsProperties], number>) = e.target.value
+            }
+            return newQuarter
+        })
+    }
+
+    // OnBlur function
+    function checkFinancialOnBlur(e: FocusEvent<HTMLInputElement, Element>) {
+        // Ignore numerics
+        if (isNumericPropertyUncast(property)) return
+        // Use function from format coverter to test
+        if (isValidFinancial(e.target.value)) {setIsValidFinancial(true); return}
+        setIsValidFinancial(false)
+        changeQuarter(quarter => {
+            // Create mutable object copy
+            let newQuarter = {...quarter};
+            if (!reports?.initial) return quarter;
+            const oldVal = filterReportByCouponCode(reports.initial, couponCode)[property];
+            (filterReportByCouponCode(newQuarter, couponCode)[property] as Exclude<ReportDataRowUncast[AnalyticsProperties], number>) = oldVal as string
+            return newQuarter
+        })
+    }
 
     return (
         <div className={clsx("flex flex-row justify-between p-0.5 gap-2 text-xs md:text-2xs text-nowrap cursor-auto",
@@ -380,17 +419,10 @@ function EditableReportDatapoint({ property, propertyValue, couponCode }: { prop
             </div>
             <input
                 type={isNumericPropertyUncast(property)? "number": "text"}
-                className="means-input"
+                className={clsx("means-input", {'means-border-red': !validFinancial})}
                 value={propertyValue}
-                onChange={(e) => {changeQuarter(quarter => {
-                    let newQuarter = {...quarter}
-                    if (isNumericPropertyUncast(property)) {
-                        (filterReportByCouponCode(newQuarter, couponCode)[property] as ReportDataRowUncast['Number of Subscribers']) = Number(e.target.value)
-                    } else {
-                        (filterReportByCouponCode(newQuarter, couponCode)[property] as Exclude<ReportDataRowUncast[AnalyticsProperties], number>) = e.target.value
-                    }
-                    return newQuarter
-                })}}
+                onChange={(e) => editQuarterOnChange(e)}
+                onBlur={(e) => checkFinancialOnBlur(e)}
             />
         </div>
     )
