@@ -20,7 +20,7 @@ function filterReportByCouponCode(quarter: QuarterlyReport, couponCode: string):
 export default function PaginatedReports ({
     initialReports,
     numReports,
-    REPORTSPERPAGE=1
+    REPORTSPERPAGE=5
 }: {
     initialReports: Promise<QuarterlyReport[] | Error>,
     numReports: Promise<number | Error>,
@@ -177,7 +177,7 @@ function Quarter ({
                     <div>Total Gross Revenue: <div className="text-means-red-hover">{grossRevenueTotal}</div></div>
                 </div>
             </div>
-            <ReportEditor hidden={!editorOpen} ref={editorRef} quarterInitial={quarter}/>
+            <ReportEditor hidden={!editorOpen} ref={editorRef} quarterInitialProps={quarter}/>
         </>
     )
 }
@@ -188,8 +188,9 @@ function Quarter ({
 const QuarterSetter = createContext<{changeQuarter: Dispatch<SetStateAction<QuarterlyReport>>}| null>(null)
 const Quarters = createContext<{initial: QuarterlyReport, current: QuarterlyReport} | null>(null)
 
-function ReportEditor({ quarterInitial, hidden, ref }: { quarterInitial: QuarterlyReport, hidden: boolean, ref: RefObject<HTMLDivElement | null> }) {
+function ReportEditor({ quarterInitialProps, hidden, ref }: { quarterInitialProps: QuarterlyReport, hidden: boolean, ref: RefObject<HTMLDivElement | null> }) {
     // Quarter editing controls
+    const [quarterInitial, setQuarterInitial] = useState(quarterInitialProps)
     const [quarter, changeQuarter] = useState(structuredClone(quarterInitial))
 
     // Form controls
@@ -227,6 +228,10 @@ function ReportEditor({ quarterInitial, hidden, ref }: { quarterInitial: Quarter
                 setError(response.statusText)
                 return
             }
+
+            // Reset quarterInitial and quarter
+            setQuarterInitial(quarter)
+            changeQuarter(structuredClone(quarter))
 
             // Reset error
             setError(null)
