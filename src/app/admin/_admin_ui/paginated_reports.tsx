@@ -7,12 +7,20 @@ import useControlOpen from "@/app/_custom_hooks/use_control_open";
 import { financialToNumeric, numberToFinancial } from "@/format_converter";
 import { QuarterlyReport, Range, ReportDataRowUncast } from "@/lib/database/schemas";
 import clsx from "clsx";
-import { createContext, Dispatch, ReactNode, RefObject, SetStateAction, startTransition, use, useActionState, useContext, useEffect, useRef, useState } from "react";
+import { createContext, Dispatch, RefObject, SetStateAction, startTransition, use, useActionState, useContext, useEffect, useRef, useState } from "react";
+import * as l from "lodash";
+import Controls from "@/app/_client_ui/pagination_controls";
+
+
+// Helpers
+function filterReportByCouponCode(quarter: QuarterlyReport, couponCode: string): ReportDataRowUncast {
+    return quarter.report_data.filter(r => r["Coupon Code"] === couponCode)[0]
+}
 
 export default function PaginatedReports ({
     initialReports,
     numReports,
-    REPORTSPERPAGE=5
+    REPORTSPERPAGE=1
 }: {
     initialReports: Promise<QuarterlyReport[] | Error>,
     numReports: Promise<number | Error>,
@@ -28,7 +36,12 @@ export default function PaginatedReports ({
     const [rangesFetched, setRangesFetched] = useState<number[]>(
         !(initReports instanceof Error)?
             // Calling python / php 'range' function on the math.floor calculation, essentially
-            [...Array(Math.floor((initReports as QuarterlyReport[]).length / REPORTSPERPAGE)).keys()]
+            [...Array(
+                Math.floor(
+                    (initReports as QuarterlyReport[]).length / REPORTSPERPAGE)
+                ) // Call array constructor on floor of number of reports, which returns an array with n empty spots
+                .keys() // Get the keys, which are the indices
+            ].map(pn => pn + 1) // Increase the keys by 1, since the indices start at 0 but page numbers start at 1
             : [1]
     ) // Not used for rendering, ref would work here too
 
@@ -169,74 +182,11 @@ function Quarter ({
     )
 }
 
-function Controls({
-    currentPage,
-    pageSetter,
-    numPages
-}: {
-    currentPage: number,
-    pageSetter: Dispatch<SetStateAction<number>>,
-    numPages: number
-}) {
-    let next2, next, prev, prev2
-
-    // Other choices to render dynamically
-    const [to1, setTo1] = useState(false)
-    const [toMax, setToMax] = useState(false)
-    const [controlArr, setControlArray] = useState(new Array<number | null>)
-
-    // Set values
-    useEffect(() => {
-        if (currentPage > numPages) pageSetter(numPages)
-
-        setToMax(currentPage + 3 >= numPages ? false : true)
-        next2 = currentPage + 1 >= numPages ? null : currentPage + 2
-        next = currentPage >= numPages ? null : currentPage + 1
-        prev = currentPage <= 1 ? null : currentPage - 1
-        prev2 = currentPage - 1 <= 1 ? null : currentPage - 2
-        setTo1(currentPage - 3 <= 1? false : true)
-
-        setControlArray([prev2, prev, currentPage, next, next2])
-    }, [currentPage, numPages])
-    function renderIfNotNull(bool:boolean, component: ReactNode) {if (bool) return component}
-    return (
-        <div className="flex flex-row justify-between gap-1 m-1 md:m-2 means-border-top rounded-b-1 text-xs md:text-sm text-means-grey ">
-            {/* Back One */}
-            <div className="hover:text-means-grey-hover cursor-pointer" onClick={() => {pageSetter(Math.max(0, currentPage - 1))}}>◁</div>
-            {/* Go to Start */}
-            {renderIfNotNull(
-                to1,
-                (<><div className="hover:text-means-grey-hover cursor-pointer" onClick={() => {pageSetter(1)}}>1
-                </div><div>...</div></>)
-            )}
-            {/* Pages Before and Afer */}
-            {controlArr.map((num, i) => {
-                if (!num) return null
-                return (
-                    <div
-                        className={clsx("hover:text-means-grey-hover cursor-pointer", {"text-means-red": num === currentPage})}
-                        onClick={() => {pageSetter(num)}}
-                        key={i}>
-                        {num}
-                    </div>
-                )
-            })}
-            {/* Go to End */}
-            {renderIfNotNull(
-                toMax,
-                (<><div>...</div><div className="hover:text-means-grey-hover cursor-pointer" onClick={() => {pageSetter(numPages)}}>{numPages}
-                </div></>)
-            )}
-            {/* Forward One */}
-            <div className="hover:text-means-grey-hover cursor-pointer" onClick={() => {pageSetter(Math.min(numPages, currentPage + 1))}}>▷</div>
-        </div>
-    )
-}
 
 // A context allows the editable fields to edit the quarter without passing it all the way down
 // Equivalent to declaring a function
-const QuarterContext = createContext<{changeQuarter: Dispatch<SetStateAction<QuarterlyReport>>}
-    | null>(null)
+const QuarterSetter = createContext<{changeQuarter: Dispatch<SetStateAction<QuarterlyReport>>}| null>(null)
+const Quarters = createContext<{initial: QuarterlyReport, current: QuarterlyReport} | null>(null)
 
 function ReportEditor({ quarterInitial, hidden, ref }: { quarterInitial: QuarterlyReport, hidden: boolean, ref: RefObject<HTMLDivElement | null> }) {
     // Quarter editing controls
@@ -284,45 +234,53 @@ function ReportEditor({ quarterInitial, hidden, ref }: { quarterInitial: Quarter
         null
     )
 
+    // Check for differences
+    const [unsavedChanges, setUnsavedChanges] = useState(false)
+    useEffect(() => {
+        setUnsavedChanges(!l.isEqual(quarter, quarterInitial))
+    }, [quarter, quarterInitial])
+
     return (
         <div
             ref={ref}
             className={clsx("means-border w-full h-fit md:w-fit md:h-fit ml-0 mt-1 md:ml-2 md:mt-0 top-full md:left-full md:top-0 bg-black z-50",
             {"hidden": hidden, "absolute": !hidden}
         )}>
-            <QuarterContext value={{ changeQuarter }}>
-            <div className="flex flex-col">
-
-                {/* Form Controls */}
-                <div className="flex flex-col text-xs md:text-sm p-1 md:p-2 gap-1 md:gap-2 means-border-bottom cursor-auto">
-                    <div className="flex flex-row gap-1 md:gap-2">
-                        {pending? <Spinner />: <></>}
-                        <Check show={pending !== null && !pending}/>
-                        <div onClick={() => startTransition(action)} className="means-border p-0.5 md:p-1 cursor-pointer hover:bg-means-bg-hover">Save Changes</div>
-                        <div onClick={() => {changeQuarter(structuredClone(quarterInitial))}} className="means-border p-0.5 md:p-1 cursor-pointer hover:bg-means-bg-hover">Reset Changes</div>
-                        <input className="means-input px-0" placeholder="Filter by coupon code..." value={filter} onChange={(e) => setFilter(e.target.value)} />
-                    </div>
-                    <Error text={error? error : ''} hidden={error? false : true} />
-                </div>
-
-                {/* Reports By Coupon Code */}
+            <QuarterSetter value={{ changeQuarter }}>
+            <Quarters value={{ initial: quarterInitial, current: quarter }}>
                 <div className="flex flex-col">
-                    {quarter.report_data
-                        .filter(r => r["Coupon Code"].toLowerCase()
-                        .includes(filter.toLowerCase()))
-                        .map((q, i) => {
-                            return (
-                                <Report reportDataRow={q} key={i}/>
-                            )
-                        })
-                        .slice((pageNumber - 1) * REPORTSPERPAGE, pageNumber * REPORTSPERPAGE)
-                    }
-                </div>
 
-                {/* Controls */}
-                <Controls currentPage={pageNumber} pageSetter={setPageNumber} numPages={numPages} />
-            </div>
-            </QuarterContext>
+                    {/* Form Controls */}
+                    <div className="flex flex-col text-xs md:text-sm p-1 md:p-2 gap-1 md:gap-2 means-border-bottom cursor-auto">
+                        <div className="flex flex-row gap-1 md:gap-2">
+                            {pending? <Spinner />: <></>}
+                            <Check show={pending !== null && !pending}/>
+                            <div onClick={() => startTransition(action)} className={clsx("p-0.5 md:p-1 cursor-pointer", {'means-border hover:bg-means-bg-hover': !unsavedChanges, "bg-means-red hover:bg-means-red-hover": unsavedChanges})}>Save Changes</div>
+                            <div onClick={() => {changeQuarter(structuredClone(quarterInitial))}} className="means-border p-0.5 md:p-1 cursor-pointer hover:bg-means-bg-hover">Reset Changes</div>
+                            <input className="means-input px-0" placeholder="Filter by coupon code..." value={filter} onChange={(e) => setFilter(e.target.value)} />
+                        </div>
+                        <Error text={error? error : ''} hidden={error? false : true} />
+                    </div>
+
+                    {/* Reports By Coupon Code */}
+                    <div className="flex flex-col">
+                        {quarter.report_data
+                            .filter(r => r["Coupon Code"].toLowerCase()
+                            .includes(filter.toLowerCase()))
+                            .map((q, i) => {
+                                return (
+                                    <Report reportDataRow={q} key={i}/>
+                                )
+                            })
+                            .slice((pageNumber - 1) * REPORTSPERPAGE, pageNumber * REPORTSPERPAGE)
+                        }
+                    </div>
+
+                    {/* Controls */}
+                    <Controls currentPage={pageNumber} pageSetter={setPageNumber} numPages={numPages} />
+                </div>
+            </Quarters>
+            </QuarterSetter>
         </div>
     )
 }
@@ -338,10 +296,21 @@ function Report({ reportDataRow }: { reportDataRow: ReportDataRowUncast }) {
         state: editorOpen,
         setState: setEditorOpen
     })
+
+    // Check for unsaved changes
+    const reports = useContext(Quarters)
+    const [unsavedChanges, setUnsavedChanges] = useState(false)
+    useEffect(() => {
+        if (!reports) return
+        const initial = filterReportByCouponCode(reports.initial, reportDataRow["Coupon Code"])
+        const curr = filterReportByCouponCode(reports.current, reportDataRow["Coupon Code"])
+        setUnsavedChanges(!l.isEqual(initial, curr))
+    }, [reports])
+
     return (
         <div className="flex flex-col means-border-bottom relative hover:bg-means-bg-hover" ref={reportRef}>
             <div className="flex flex-row justify-between text-white text-base md:text-lg pt-0.5 md:pt-1 px-0.5 md:px-1">
-                <div>{reportDataRow["Coupon Code"]}</div>
+                <div>{reportDataRow["Coupon Code"]} {unsavedChanges? <div className="text-means-red text-xs inline-block">(unsaved changes)</div>: <></>}</div>
                 <div>{editorOpen? "▽" : "▷"}</div>
             </div>
             <div className="flex flex-row gap-2 p-0.5 md:p-1 text-means-grey text-xs">
@@ -374,16 +343,36 @@ function EditableReportProperties({ reportDataRow, hidden, ref }: { reportDataRo
     )
 }
 
+
+
 function EditableReportDatapoint({ property, propertyValue, couponCode }: { property: AnalyticsProperties, propertyValue: string | number, couponCode: string }) {
     // Get the context
-    const context = useContext(QuarterContext)
+    const context = useContext(QuarterSetter)
     if (!context) return (
         <Error text={"Could not find context"} hidden={false} />
     )
     const { changeQuarter } = context
+
+    // Check for unsaved changes
+    const [unsavedChanges, setUnsavedChanges] = useState(false)
+    const reports = useContext(Quarters)
+    useEffect(() => {
+        if (!reports) return
+        const initial = filterReportByCouponCode(reports.initial, couponCode)[property]
+        const curr = filterReportByCouponCode(reports.current, couponCode)[property]
+        setUnsavedChanges(initial !== curr)
+    }, [reports])
+
     return (
-        <div className="flex flex-row justify-between p-0.5 gap-2 text-xs md:text-2xs text-nowrap means-border-bottom cursor-auto">
-            <div>{property}</div>
+        <div className={clsx("flex flex-row justify-between p-0.5 gap-2 text-xs md:text-2xs text-nowrap cursor-auto",
+            {'means-border-bottom-red': unsavedChanges, 'means-border-bottom': !unsavedChanges}
+        )}>
+            <div>
+                {property} {unsavedChanges?
+                    <div className="inline-block text-2xs text-means-red">orig: {reports? filterReportByCouponCode(reports.initial, couponCode)[property]: ""}</div>
+                    : <></>
+                }
+            </div>
             <input
                 type={isNumericPropertyUncast(property)? "number": "text"}
                 className="means-input"
@@ -391,9 +380,9 @@ function EditableReportDatapoint({ property, propertyValue, couponCode }: { prop
                 onChange={(e) => {changeQuarter(quarter => {
                     let newQuarter = {...quarter}
                     if (isNumericPropertyUncast(property)) {
-                        (newQuarter.report_data.filter(r => r["Coupon Code"] === couponCode)[0][property] as ReportDataRowUncast['Number of Subscribers']) = Number(e.target.value)
+                        (filterReportByCouponCode(newQuarter, couponCode)[property] as ReportDataRowUncast['Number of Subscribers']) = Number(e.target.value)
                     } else {
-                        (newQuarter.report_data.filter(r => r["Coupon Code"] === couponCode)[0][property] as Exclude<ReportDataRowUncast[AnalyticsProperties], number>) = e.target.value
+                        (filterReportByCouponCode(newQuarter, couponCode)[property] as Exclude<ReportDataRowUncast[AnalyticsProperties], number>) = e.target.value
                     }
                     return newQuarter
                 })}}
