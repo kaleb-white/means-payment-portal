@@ -11,7 +11,7 @@ import { Quarter } from "./quarter";
 export default function PaginatedReports ({
     initialReports,
     numReports,
-    REPORTSPERPAGE=4
+    REPORTSPERPAGE=5
 }: {
     initialReports: Promise<QuarterlyReport[] | Error>,
     numReports: Promise<number | Error>,

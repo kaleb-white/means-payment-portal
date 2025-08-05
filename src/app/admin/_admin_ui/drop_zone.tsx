@@ -61,7 +61,7 @@ export default function DropZone({
 
 
     return (
-        <div className={clsx("flex flex-row text-xs text-center p-1", {'means-border-bottom-red': isOver, 'means-border-bottom': !isOver})}
+        <div className={clsx("flex flex-row text-center p-1", {'means-border-bottom-red': isOver, 'means-border-bottom': !isOver})}
             onDragOver={(e) => handleDragOver(e)}
             onDragLeave={(e) => handleDragOut(e)}
             onDrop={(e) => {e.preventDefault(); setDragEvent(e); startTransition(action)}}

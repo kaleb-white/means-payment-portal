@@ -14,12 +14,12 @@ export default function Button({
 }) { return (
     <div
         onClick={onClick}
-        className={clsx("means-border p-0.5 md:p-1",
+        className={clsx(styles,
             {
                 "hover:bg-means-bg-hover cursor-pointer text-white": !disabled,
                 "cursor-auto text-means-grey": disabled
             },
-            styles
+            "means-border p-0.5 md:p-1"
         )}
     >
         {text}

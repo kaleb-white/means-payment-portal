@@ -101,7 +101,7 @@ export function CreateReport() {
     )
 
     return (
-        <div className="flex flex-col justify-center means-border w-full relative">
+        <div className="flex flex-col justify-center means-border w-full relative text-sm md:text-base">
             {/* Drop zone */}
             <DropZone setNewFiles={setUnprocessedFiles}/>
             {csvsPending? <Spinner />: <></>}
@@ -111,7 +111,7 @@ export function CreateReport() {
                 {pending? <Spinner /> : <></>}
                 <input
                     type="file" accept=".csv" multiple ref={inputRef}
-                    className="flex flex-row cursor-pointer text-center text-means-grey hover:text-means-grey-hover text-xs"
+                    className="flex flex-row cursor-pointer text-center text-means-grey hover:text-means-grey-hover"
                     onChange={(e) => {e.preventDefault(); startTransition(action)}}
                 />
             </div>
@@ -127,7 +127,8 @@ export function CreateReport() {
             {/* Controls */}
             <div className={clsx("flex flex-row place-content-center w-full p-1 md:p-2 gap-1 md:gap-2", {'means-border-top': errors.length > 0})}>
                 <Check show={success}/>
-                <Button text="Save Changes" onClick={() => startTransition(saveAction)} disabled={savePending} styles="text-sm w-full text-center" />
+                <Button text="Save Changes" onClick={() => startTransition(saveAction)} disabled={savePending} styles="w-full text-center" />
+                <Button text="Reset" onClick={() => setNewReports([])} />
             </div>
         </div>
     )
