@@ -22,3 +22,12 @@ export enum dbTableNames {
     testQuarterlyReports='test_quarterly_reports',
     quarterlyReports='quarterly_reports'
 }
+
+export enum fileTypes {
+    csvs='text/csv application/vnd.ms-excel'
+}
+
+export enum timers {
+    errorTimeout=5000,
+    nextErrorTimeout=500,
+}

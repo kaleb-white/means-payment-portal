@@ -6,15 +6,20 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     if (!body) return new Response('', {status: 400, statusText: 'Body required'})
 
-    let parseResult
-    try {
-        parseResult = QuarterlyReportSchema.parse(body)
-    } catch {
-        return new Response('', {status: 400, statusText:'Error while parsing body data'})
+    const parseResult = QuarterlyReportSchema.safeParse(body)
+
+    if (parseResult.error) {
+        return new Response('', {status: 400, statusText: "Error while parsing body data"})
     }
 
     const dbContext = await DatabaseContext()
-    const serviceResponse = await dbContext.analyticsService.createQuarterlyReport(parseResult)
+
+    const quarters = await dbContext.analyticsService.getAllQuarterlyReports([{year: String(parseResult.data.year), quarter: String(parseResult.data.quarter)}])
+    if (!(quarters instanceof Error) && !(quarters.length === 0)) {
+        return new Response('', {status: 400, statusText: "A quarter already exists for that report! Delete that quarter first."})
+    }
+
+    const serviceResponse = await dbContext.analyticsService.createQuarterlyReport(parseResult.data)
 
     if (serviceResponse instanceof Error) return new Response('', {status: 400, statusText: serviceResponse.message})
 

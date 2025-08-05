@@ -14,7 +14,6 @@ export async function POST(request: NextRequest) {
     const serviceResponse = await dbContext.analyticsService.getQuarterlyReportsRange(parseResult.data.start, parseResult.data.stop)
 
     if (serviceResponse instanceof Error) return new Response('', {status: 400, statusText: serviceResponse.message})
-    console.log(serviceResponse)
 
     return new Response(JSON.stringify(serviceResponse), {status: 200, statusText: 'Succesfully fetched range'})
 }
