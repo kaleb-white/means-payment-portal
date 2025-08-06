@@ -42,7 +42,7 @@
 
     .means-border-top {
         border-top-width: 0.8px;
-        border-top: rgb(77, 77, 77);
+        border-top-color: rgb(77, 77, 77);
     }
 
     .means-underline {

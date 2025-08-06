@@ -32,7 +32,7 @@ export default function Controls({
     }, [currentPage, numPages])
     function renderIfNotNull(bool:boolean, component: ReactNode) {if (bool) return component}
     return (
-        <div className="flex flex-row justify-between gap-1 m-1 md:m-2 means-border-top rounded-b-1 text-xs md:text-sm text-means-grey ">
+        <div className="flex flex-row justify-between gap-1 m-1 md:m-2 rounded-b-1 text-xs md:text-sm text-means-grey ">
             {/* Back One */}
             <div className="hover:text-means-grey-hover cursor-pointer" onClick={() => {pageSetter(Math.max(0, currentPage - 1))}}>◁</div>
             {/* Go to Start */}

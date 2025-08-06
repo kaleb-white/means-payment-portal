@@ -39,3 +39,5 @@ export const RangeSchema = z.object({
     start: z.number(),
     stop: z.number()
 })
+
+export const FileSchema = z.file().mime("text/csv")
