@@ -19,36 +19,6 @@ export function CreateReport() {
     const [unprocessedFiles, setUnprocessedFiles] = useState<Array<File>>([])
     const [newReports, setNewReports] = useState<Array<QuarterlyReport>>([])
 
-
-    const [_, processCsv, csvsPending] = useActionState(async () => {
-        // Stop on error
-        let earlyExit = false
-
-        unprocessedFiles.forEach((file) => {
-            // Check that a csv is being uploaded
-            if (!fileTypes.csvs.includes(file.type)) {
-                setErrors(prev => [...prev, new Error("Please upload only csvs. If you are uploading a csv and this message appears, contact the system admin.")])
-                earlyExit = true
-            }
-        })
-        if (earlyExit) return
-
-        unprocessedFiles.forEach(async file => {
-            const res = await parseCsvAsQuarterlyReport(file)
-            if (isError(res)) {setErrors(prev => [...prev, new Error(res.message)]); return}
-            setNewReports(prev => [...prev, res])
-        })
-
-
-        setUnprocessedFiles([])
-    }, null)
-
-
-    useEffect(() => {
-        if (unprocessedFiles.length === 0) return
-        startTransition(processCsv)
-    }, [unprocessedFiles])
-
     // Errors
     const [errors, setErrors] = useState<Array<Error>>([])
 
@@ -69,6 +39,34 @@ export function CreateReport() {
         }
         setUnprocessedFiles(prev => [...prev, ...newFiles])
     }
+
+    // Process uploads
+    const [_, processCsv, csvsPending] = useActionState(async () => {
+        // Check that all file types are csvs, stop on error
+        let earlyExit = false
+        unprocessedFiles.forEach((file) => {
+            // Check that a csv is being uploaded
+            if (!fileTypes.csvs.includes(file.type)) {
+                setErrors(prev => [...prev, new Error("Please upload only csvs. If you are uploading a csv and this message appears, contact the system admin.")])
+                earlyExit = true
+            }
+        })
+        if (earlyExit) return
+
+        // Process csv and error check
+        unprocessedFiles.forEach(async file => {
+            const res = await parseCsvAsQuarterlyReport(file)
+            if (isError(res)) {setErrors(prev => [...prev, new Error(res.message)]); return}
+            setNewReports(prev => [...prev, res])
+        })
+
+        setUnprocessedFiles([])
+    }, null)
+    useEffect(() => {
+        // Only run effect if there are files to process
+        if (unprocessedFiles.length === 0) return
+        startTransition(processCsv)
+    }, [unprocessedFiles])
 
     // Handle save to db
     const [success, setSuccess] = useState(false)
