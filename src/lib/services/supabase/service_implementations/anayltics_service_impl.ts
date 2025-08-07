@@ -167,7 +167,7 @@ export class SupabaseAnayticsService {
             .select('year, quarter')
             .eq('year', report.year)
             .eq('quarter', report.quarter)
-        if (match.count && match.count > 0) return new Error("Report exists for given year and quarter")
+        if (match.data && match.data.length > 0) return new Error("Report exists for given year and quarter")
 
         // Insert the new report
         const { data, error } = await supabase
@@ -230,17 +230,21 @@ export class SupabaseAnayticsService {
             .select('year, quarter')
             .eq('year', quarter.year)
             .eq('quarter', quarter.quarter)
-        if (!match.count || match.count !== 1) return new Error(match.count === 0 ? "No matching report was found" : "Multiple matching reports were found")
+        if (!match.data || match.data.length === 0) return new Error("No matching report was found")
+        if (match.data.length !== 1) return new Error("Multiple matching reports were found")
 
         // Perform delete
-        const { error } = await supabase
-            .from(tableName)
+        const { error, data } = await supabase.from(tableName)
             .delete()
             .eq('year', quarter.year)
             .eq('quarter', quarter.quarter)
+            .select()
 
         // If error, return it
         if (error) return error
+
+        // If no data was returned, throw error
+        if (data && data.length !== 1) return new Error(data.length === 0? "No rows were actually deleted, whoops": "Multiple rows were deleted..... sorry, this means I fucked up")
 
         return true
     }

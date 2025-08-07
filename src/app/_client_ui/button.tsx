@@ -1,13 +1,20 @@
 import clsx from "clsx"
 import { MouseEventHandler } from "react"
 
+/**
+ * Default button component.
+ * @param text Either text or a ReactNode.
+ * @param onClick The function to run on click.
+ * @param disable Optional, changes text color to grey. Does not rely on type of text.
+ * @param styles Additional styles to add; is of type string | {[key: string]: boolean}. Adds styles before the default styles; however, sometimes does not end up overruling them.
+ */
 export default function Button({
     text,
     onClick,
     disabled=false,
     styles=""
 }: {
-    text: string,
+    text: string | React.ReactNode,
     onClick: MouseEventHandler,
     disabled?: boolean,
     styles?: string | {[key: string]: boolean}

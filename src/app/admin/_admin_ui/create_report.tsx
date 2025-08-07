@@ -124,6 +124,7 @@ export function CreateReport() {
 
             {/* Controls */}
             <div className={clsx("flex flex-row place-content-center w-full p-1 md:p-2 gap-1 md:gap-2", {'means-border-top': errors.length > 0})}>
+                {savePending? <Spinner /> : <></>}
                 <Check show={success}/>
                 <Button text="Save Changes" onClick={() => startTransition(saveAction)} disabled={savePending} styles="w-full text-center" />
                 <Button text="Reset" onClick={() => setNewReports([])} />

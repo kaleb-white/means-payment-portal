@@ -5,12 +5,12 @@ import useControlOpen from "../_custom_hooks/use_control_open";
 // Reference: https://tailwindcss.com/plus/ui-blocks/application-ui/overlays/modal-dialogs
 export default function Modal({
     isOpen,
-    setIsOpen
-    /*children: React.ReactNode*/
+    setIsOpen,
+    children=<></>
 }: {
     isOpen: boolean,
-    setIsOpen: Dispatch<SetStateAction<boolean>>
-    /*children: React.ReactNode*/
+    setIsOpen: Dispatch<SetStateAction<boolean>>,
+    children?: React.ReactNode
 }) {
     const parent = useRef(null)
     const child = useRef(null)
@@ -19,12 +19,12 @@ export default function Modal({
     if (!isOpen) return  <></>
     return (
         <>
-            <div className="fixed inset-0 bg-means-grey/75" ref={parent}>
+            <div className="fixed inset-0 bg-means-grey/50" ref={parent}>
             </div>
             <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
                 <div className="flex min-h-full items-end sm:items-center justify-center">
-                    <div className="flex flex-col means-border bg-black min-w-5 min-h-5" ref={child}>
-
+                    <div className="flex flex-col means-border bg-black w-fit h-fit p-2 md:p-4" ref={child}>
+                        {children}
                     </div>
                 </div>
             </div>
