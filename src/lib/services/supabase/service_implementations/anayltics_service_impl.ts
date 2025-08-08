@@ -170,14 +170,13 @@ export class SupabaseAnayticsService {
         if (match.data && match.data.length > 0) return new Error("Report exists for given year and quarter")
 
         // Insert the new report
-        const { data, error } = await supabase
-            .from(tableName)
+        const { data, error } = await supabase.from(tableName)
             .insert([report])
             .select()
 
         // If error, return it
         if (error) return error
-        if (!data) return new Error("No data was inserted as supabase returned no data")
+        if (!data) return new Error("No data was inserted as database returned no data")
 
         return true
     }
@@ -197,12 +196,11 @@ export class SupabaseAnayticsService {
             .select('year, quarter')
             .eq('year', report.year)
             .eq('quarter', report.quarter)
-        if (!match.data) return new Error("No data was returned")
+        if (!match.data) return new Error("No matching report was found")
         if (match.data.length !== 1) return new Error(match.data.length === 0 ? "No matching report was found" : "Multiple matching reports were found")
 
         // Perform update
-        const { data, error } = await supabase
-            .from(tableName)
+        const { data, error } = await supabase.from(tableName)
             .update({ 'report_data': report.report_data })
             .eq('year', report.year)
             .eq('quarter', report.quarter)
