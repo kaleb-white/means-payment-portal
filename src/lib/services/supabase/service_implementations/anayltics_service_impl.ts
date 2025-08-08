@@ -240,8 +240,6 @@ export class SupabaseAnayticsService {
 
         // If error, return it
         if (error) return error
-
-        // If no data was returned, throw error
         if (data && data.length !== 1) return new Error(data.length === 0? "No rows were actually deleted, whoops": "Multiple rows were deleted..... sorry, this means I fucked up")
 
         return true

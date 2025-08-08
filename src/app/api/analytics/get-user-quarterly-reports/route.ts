@@ -9,15 +9,14 @@ export async function POST(request: NextRequest) {
 
     let parseResult
     try {
-        parseResult = dateInYearQuarterArray.safeParse(body)
+        parseResult = dateInYearQuarterArray.parse(body)
     } catch {
         return new Response("", {status: 400, statusText: 'Error while parsing body data'})
     }
-    if (!parseResult.success) return new Response('', {status: 400, statusText:'Unable to parse body data'})
 
 
     const dbContext = await DatabaseContext()
-    const quarterlyReports = await dbContext.analyticsService.getUserQuarterlyReports(parseResult.data)
+    const quarterlyReports = await dbContext.analyticsService.getUserQuarterlyReports(parseResult)
 
     return new Response(JSON.stringify(quarterlyReports), {status: 200, statusText: "Succesfully got reports"})
 }
