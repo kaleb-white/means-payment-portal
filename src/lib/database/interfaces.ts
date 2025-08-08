@@ -1,4 +1,4 @@
-import { DateInYearQuarter, QuarterlyReport, ReportDataRow, User } from "./schemas"
+import { CouponCode, DateInYearQuarter, QuarterlyReport, ReportDataRow, User } from "./schemas"
 
 export interface UserServicesObj {}
 export interface AuthServicesObj{}
@@ -25,10 +25,48 @@ export interface UserServices {
     deleteUser(id: string): Promise<void>
     /**
      * Gets the user's coupon code. Does not perform auth checks.
-     * @param user - The current user, as returned by getCurrentUser.
+     * @param user The current user, as returned by getCurrentUser.
      * @returns A string containing the users unique coupon code.
      */
     getUserCouponByUser(user: User): Promise<string | null>
+    /**
+     * ** ADMIN ROLE REQUIRED **
+     * @param email The user's email.
+     */
+    getUserCouponByEmail(email: string): Promise<CouponCode| Error>
+    /**
+     * ** ADMIN ROLE REQUIRED **
+     * @returns All coupon codes and users, or an error.
+     */
+    getAllCouponCodes(): Promise<Array<CouponCode> | Error>
+    /**
+     * ** ADMIN ROLE REQUIRED **
+     * Assosciates an email with a coupon code.
+     * @param email
+     * @param couponCode
+     */
+    createCouponCode(email: string, couponCode: string): Promise<boolean | Error>
+    /**
+     * ** ADMIN ROLE REQUIRED **
+     * Updates the coupon code assosciated with an email.
+     * @param email The email used to select the coupon code.
+     * @param couponCode The coupon code to be changed.
+     */
+    updateCouponCode(email: string, couponCode: string): Promise<boolean | Error>
+    /**
+     * ** ADMIN ROLE REQUIRED **
+     * Updates the coupon code assosciated with an email.
+     * @param email The email to be changed.
+     * @param couponCode The coupon code used to select the email.
+     */
+    updateEmailInCouponCode(email: string, couponCode: string): Promise<boolean | Error>
+    /**
+     * ** ADMIN ROLE REQUIRED **
+     * Deletes a coupon code and email.
+     * @param email
+     * @param couponCode
+     */
+    deleteCouponCode(email:string, couponCode: string): Promise<boolean | Error>
 }
 
 export interface AuthServices {

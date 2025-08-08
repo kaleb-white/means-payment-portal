@@ -1,9 +1,5 @@
 import { ReportDataRow } from "@/lib/database/schemas"
 
-export const AnalyticsPropertiesOrderedArray = [
-
-]
-
 export const AnalyticsPropertiesAsArray = [
     "Net Revenue",
     "Stripe Fees",

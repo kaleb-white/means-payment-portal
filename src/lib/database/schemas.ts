@@ -1,3 +1,6 @@
+import * as z from 'zod'
+import { CouponCodeSchema } from '../zod'
+
 export interface User { // Modeled on (a partial of) supabase user obj: https://supabase.com/docs/guides/auth/users
     id: string // Unique User ID (UUID)
     aud: string // The 'audience claim', JWT token describing access service or addres
@@ -41,8 +44,6 @@ export interface ReportDataRow {
     "Total (Net Revenue - Refund)": number
 }
 
-
-
 export interface DateInYearQuarter {
     year: string,
     quarter: string
@@ -57,3 +58,5 @@ export interface Range {
     start: number,
     stop: number
 }
+
+export type CouponCode = z.infer<typeof CouponCodeSchema>
