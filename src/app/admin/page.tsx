@@ -12,7 +12,7 @@ export default async function Analytics() {
 
     return (
         <div className="flex flex-col md:flex-row gap-5 md:gap-8">
-            <div className="flex flex-col w-1/4 gap-2">
+            <div className="flex flex-col min-w-1/4 w-fit gap-2">
                 <Header text="Edit Reports" textSize="xl"/>
                 <PaginatedReports initialReports={initialReports} numReports={numReports} />
             </div>

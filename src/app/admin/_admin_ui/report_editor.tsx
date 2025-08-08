@@ -1,12 +1,10 @@
 import Controls from "@/app/_client_ui/pagination_controls"
-import Error from "@/app/_client_ui/error"
-import { Spinner, Check } from "@/app/_client_ui/spinner"
 import { QuarterlyReport } from "@/lib/database/schemas"
 import clsx from "clsx"
 import { Dispatch, SetStateAction, RefObject, useState, useEffect, useActionState, startTransition, createContext } from "react"
 import * as l from "lodash";
 import { ReportDataRow } from "./report_data_row"
-import Button from "@/app/_client_ui/button"
+import EditorControls from "./editor_controls"
 
 // A context allows the editable fields to edit the quarter without passing it all the way down
 // Equivalent to declaring a function
@@ -94,18 +92,17 @@ export function ReportEditor({
                 <div className="flex flex-col">
 
                     {/* Form Controls */}
-                    <div className="flex flex-col text-xs md:text-sm p-1 md:p-2 gap-1 md:gap-2 means-border-bottom cursor-auto">
-                        <div className="flex flex-row gap-1 md:gap-2">
-                            {noPost? <></> : <>
-                                {pending? <Spinner />: <></>}
-                                <Check show={pending !== null && !pending}/>
-                                <Button onClick={() => startTransition(action)} text="Save Changes" styles={{'means-border hover:bg-means-bg-hover': !unsavedChanges, "border-0 rounded-none bg-means-red hover:bg-means-red-hover": unsavedChanges}} />
-                            </>}
-                            <Button onClick={() => {changeQuarter(structuredClone(quarterInitial))}} text="Reset Changes" />
-                            <input className="means-input px-0" placeholder="Filter by coupon code..." value={filter} onChange={(e) => setFilter(e.target.value)} />
-                        </div>
-                        <Error text={error? error : ''} hidden={error? false : true} />
-                    </div>
+                    <EditorControls
+                        noSave={noPost}
+                        savePending={pending}
+                        unsavedChanges={unsavedChanges}
+                        onSave={() => startTransition(action)}
+                        onResetChanges={() => {changeQuarter(structuredClone(quarterInitial))}}
+                        filter={filter}
+                        filterPlaceholder="Filter by coupon code..."
+                        setFilter={setFilter}
+                        error={error}
+                    />
 
                     {/* Reports By Coupon Code */}
                     <div className="flex flex-col">

@@ -35,6 +35,15 @@
         border-bottom-color: rgb(77, 77, 77);
     }
 
+    .means-border-bottom-explicit {
+        border-bottom-width: 0.8px;
+        border-bottom-color: rgb(77, 77, 77);
+        border-radius: 0px;
+        border-top-width: 0px;
+        border-right-width: 0px;
+        border-left-width: 0px;
+    }
+
     .means-border-bottom-red {
         border-bottom-width: 0.8px;
         border-bottom-color: oklch(0.6565 0.2358 12.27);

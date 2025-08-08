@@ -7,6 +7,10 @@ import clsx from "clsx";
 import { startTransition, use, useActionState, useEffect, useState } from "react";
 import Controls from "@/app/_client_ui/pagination_controls";
 import { Quarter } from "./quarter";
+import Button from "@/app/_client_ui/button";
+import Image from 'next/image';
+import useRemoveError from "@/app/_custom_hooks/use_remove_error";
+import Modal from "@/app/_client_ui/modal";
 
 export default function PaginatedReports ({
     initialReports,
@@ -38,6 +42,7 @@ export default function PaginatedReports ({
 
     // Fetch new reports
     const [error, setError] = useState<string | null>(null)
+    useRemoveError(error, setError)
     const [_, action, pending] = useActionState(
         async () => {
             // Reports are already fetched for this range
@@ -62,9 +67,6 @@ export default function PaginatedReports ({
                 setError(response.statusText)
                 return
             }
-
-            // Reset error
-            setError(null)
 
             const responseData = await response.json() as QuarterlyReport[]
 
@@ -93,6 +95,43 @@ export default function PaginatedReports ({
         transitionReportData()
     }, [pageNumber])
 
+    // Modal
+    const [modalOpen, setModalOpen] = useState(false)
+
+
+    // Delete reports
+    const [reportToDelete, setReportToDelete] = useState<QuarterlyReport | null>(null)
+    const [__, deleteReport, deletePending] = useActionState(async () => {
+        if (!reportToDelete) {setError("Delete action called with no report defined"); return}
+        const response = await fetch('api/analytics/delete-quarterly-report', {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({year: String(reportToDelete.year), quarter: String(reportToDelete.quarter)})
+
+        })
+
+        // Handle an error; display to user
+        if (response.status !== 200) {
+            setError(response.statusText)
+            return
+        }
+
+        // Remove quarter on success
+        setReports(reports => {
+            if (reports instanceof Error) return reports
+            return (reports as QuarterlyReport[])
+                .filter(r =>
+                    !(r.quarter === reportToDelete?.quarter
+                    && r.year === reportToDelete.year))
+        })
+
+        // Reset reportToDelete
+        setReportToDelete(null)
+    }, null)
+
 
     if (reports instanceof Error || reportsLength instanceof Error) {
         return (
@@ -104,24 +143,50 @@ export default function PaginatedReports ({
     }
     return (
         <div className="flex flex-col means-border w-full">
+            {/* Delete confirmation modal */}
+            <Modal isOpen={modalOpen} setIsOpen={setModalOpen}>
+                <div className="flex flex-col text-sm md:text-lg">
+                    <div>Are you sure you want to delete this report?</div>
+                    <div className="flex flex-row mt-1 md:mt-2 gap-2">
+                    <Button text={"Yes"} onClick={() => {setModalOpen(false); startTransition(deleteReport)}}/>
+                    <Button text={"No"} onClick={() => setModalOpen(false)} />
+                    </div>
+                </div>
+            </Modal>
+
             {/* Reports */}
             <div className="flex flex-col md:relative">
-                <div className="flex flex-col items-center">
-                    {pending? <Spinner /> : <></>}
-                </div>
-                {(reports as QuarterlyReport[])
-                    .slice((pageNumber - 1) * REPORTSPERPAGE, pageNumber * REPORTSPERPAGE)
-                    .map((r, i) => {return (
-                        <div className={clsx("relative md:static hover:bg-means-bg-hover cursor-pointer", `z-${i}`)} key={i}>
-                            <Quarter quarter={r}/>
-                        </div>
-                    )})
-                }
+
+                    {(reports as QuarterlyReport[])
+                        .slice((pageNumber - 1) * REPORTSPERPAGE, pageNumber * REPORTSPERPAGE)
+                        .map((r, i) => {return (
+
+                            <div className="flex flex-row gap-0" key={i}>
+                                {/* Delete button */}
+                                <div className="means-border-bottom flex flex-col gap-1 justify-center items-center p-0.5 md:p-1">
+                                    <Button
+                                        onClick={() => {setReportToDelete(r); setModalOpen(true)}}
+                                        text={<Image src="/trash.svg" alt="Delete Report" width={24} height={24}/>}
+                                        styles={"h-fit mx-auto means-border hover:bg-means-bg-hover cursor-pointer"}
+                                    />
+                                </div>
+                                {/* Quarter */}
+                                <div className={clsx("relative md:static hover:bg-means-bg-hover cursor-pointer", `z-${i}`)}>
+                                    <Quarter quarter={r}/>
+                                </div>
+                            </div>
+
+                        )})
+                    }
             </div>
             {/* Controls */}
             <Controls currentPage={pageNumber} pageSetter={setPageNumber} numPages={Math.ceil((reportsLength as number) / REPORTSPERPAGE)} />
             {/* Error */}
             <Error text={error? error: ''} hidden={error? false: true} />
+            {/* Spinner */}
+            <div className="flex flex-col items-center">
+                {pending || deletePending? <Spinner /> : <></>}
+            </div>
         </div>
     )
 }

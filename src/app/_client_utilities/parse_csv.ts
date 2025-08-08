@@ -6,6 +6,7 @@ import _ from "lodash";
 import { quarterToDateInYearQuarter } from "@/format_converter";
 
 export async function parseCsvAsQuarterlyReport(file: File): Promise<QuarterlyReport | Error> {
+    // Reference: https://www.papaparse.com/docs
     const parseOptions: Papa.ParseConfig = {
         transformHeader: undefined,
         dynamicTyping: true,
