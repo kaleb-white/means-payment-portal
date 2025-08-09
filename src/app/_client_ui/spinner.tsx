@@ -16,15 +16,15 @@ export function Spinner() {
 
 /**
  * A green checkmark.
- * @param show On change, briefly shows check animation, then disappears
+ * @param pending The boolean indicating a pending action.
  */
-export function Check({ show }:{ show:boolean }) {
-    const [isShowing, setIsShowing] = useState(show)
+export function Check({ success }:{ success: boolean }) {
+    const [isShowing, setIsShowing] = useState(false)
     useEffect(() => {
-        if (show === false) return
+        if (!success) return
         setIsShowing(true)
         setTimeout(() => setIsShowing(false), 1000)
-    }, [show])
+    }, [success])
     return (
         <div className={clsx("items-center animate-pulse", {'hidden': !isShowing, 'flex': isShowing})}>
             <div dangerouslySetInnerHTML={{__html: "<!-- credit to https://www.onlinewebfonts.com/icon/576697 -->"}} />

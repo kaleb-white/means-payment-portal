@@ -63,6 +63,7 @@
     .means-input {
         color: oklch(0.6565 0.2358 12.27);
         text-decoration-color: oklch(0.6565 0.2358 12.27);
+        max-width: 50%;
         @apply text-center underline decoration-dashed
     }
 
@@ -100,4 +101,14 @@ input::-webkit-inner-spin-button {
 /* Firefox */
 input[type=number] {
     -moz-appearance: textfield;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
 }

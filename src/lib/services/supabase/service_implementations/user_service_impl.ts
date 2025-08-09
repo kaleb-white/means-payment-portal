@@ -73,7 +73,7 @@ export class SupabaseUserService  {
 
         let couponCodes
         try {
-            couponCodes = data as Array<CouponCode>
+            couponCodes = data.map((c) => {return {email:c.email, couponCode:c.coupon_code}})
         } catch {
             return new Error("There was an issue with the data returned by the databse. Please contact the server admin")
         }

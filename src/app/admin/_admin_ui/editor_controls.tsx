@@ -6,6 +6,7 @@ import { Spinner, Check } from "@/app/_client_ui/spinner";
 export default function EditorControls({
     noSave,
     savePending,
+    saveSuccess,
     unsavedChanges,
     onSave,
     onResetChanges,
@@ -16,6 +17,7 @@ export default function EditorControls({
 }:{
     noSave: boolean,
     savePending: boolean,
+    saveSuccess: boolean,
     unsavedChanges: boolean,
     onSave: Function,
     onResetChanges: Function,
@@ -24,12 +26,13 @@ export default function EditorControls({
     setFilter: Dispatch<SetStateAction<string>>,
     error: string | null
 }) {
+
     return (
         <div className="flex flex-col text-xs md:text-sm p-1 md:p-2 gap-1 md:gap-2 means-border-bottom cursor-auto">
             <div className="flex flex-row gap-1 md:gap-2">
                 {noSave? <></> : <>
                     {savePending? <Spinner />: <></>}
-                    <Check show={savePending !== null && !savePending}/>
+                    <Check success={saveSuccess}/>
                     <Button onClick={() => onSave()} text="Save Changes" styles={{'means-border hover:bg-means-bg-hover': !unsavedChanges, "border-0 rounded-none bg-means-red hover:bg-means-red-hover": unsavedChanges}} />
                 </>}
                 <Button onClick={() => onResetChanges()} text="Reset Changes" />

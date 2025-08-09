@@ -98,7 +98,6 @@ export default function PaginatedReports ({
     // Modal
     const [modalOpen, setModalOpen] = useState(false)
 
-
     // Delete reports
     const [reportToDelete, setReportToDelete] = useState<QuarterlyReport | null>(null)
     const [__, deleteReport, deletePending] = useActionState(async () => {

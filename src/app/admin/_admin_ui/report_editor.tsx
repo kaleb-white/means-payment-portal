@@ -46,6 +46,7 @@ export function ReportEditor({
     }, [REPORTSPERPAGE, filter])
 
     // Save report
+    const [saveSuccess, setSaveSuccess] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [_, action, pending] = useActionState(
         async () => {
@@ -70,6 +71,10 @@ export function ReportEditor({
 
             // Reset error
             setError(null)
+
+            // Set success checkmark
+            setSaveSuccess(false)
+            setSaveSuccess(true)
         },
         null
     )
@@ -96,6 +101,7 @@ export function ReportEditor({
                         noSave={noPost}
                         savePending={pending}
                         unsavedChanges={unsavedChanges}
+                        saveSuccess={saveSuccess}
                         onSave={() => startTransition(action)}
                         onResetChanges={() => {changeQuarter(structuredClone(quarterInitial))}}
                         filter={filter}
