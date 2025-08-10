@@ -18,11 +18,11 @@ export default async function Analytics() {
                 <Header text="Edit Reports" textSize="xl"/>
                 <PaginatedReports initialReports={initialReports} numReports={numReports} />
             </div>
-            <div className="flex flex-col w-fit gap-2 max-w-1/4">
+            <div className="flex flex-col w-fit gap-2 md:max-w-1/4">
                 <Header text="Add New Reports" textSize="xl"/>
                 <CreateReport />
             </div>
-            <div className="flex flex-col w-fit max-w-1/4 gap-2">
+            <div className="flex flex-col w-fit md:max-w-1/4 gap-2">
                 <Header text="Edit Coupon Codes" textSize="xl"/>
                 <PaginatedCouponCodes initialCouponCodes={couponCode}/>
             </div>

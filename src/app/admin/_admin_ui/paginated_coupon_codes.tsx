@@ -1,17 +1,20 @@
 'use client'
 import Controls from "@/app/_client_ui/pagination_controls"
 import CouponCodeComponent from "./coupon_code_component"
-import Error from "@/app/_client_ui/error"
 import getItemSetter from "@/app/_client_utilities/get_item_setter"
+import * as CustomError from "@/app/_client_ui/error"
 import { CouponCode } from "@/lib/database/schemas"
-import { useEffect, useState, use, useActionState, startTransition } from "react"
+import { useEffect, useState, use, useActionState, startTransition, useRef, useContext, createContext } from "react"
 import { isEqual, difference } from 'lodash'
 import EditorControls from "./editor_controls"
 import { apiRoutes } from "@/configs"
+import MultiError from "@/app/_client_ui/multi_error"
+
+export const CouponCodesContext = createContext<CouponCode[]>([])
 
 export default function PaginatedCouponCodes ({
     initialCouponCodes,
-    REPORTSPERPAGE=1
+    REPORTSPERPAGE=5
 }: {
     initialCouponCodes: Promise<CouponCode[] | Error>,
     REPORTSPERPAGE?: number
@@ -21,15 +24,17 @@ export default function PaginatedCouponCodes ({
     const [couponCodesInitial, setCouponCodesInitial] = useState(
         structuredClone(couponCodesPromise instanceof Error?
             []:
-            (couponCodesPromise as CouponCode[])
+            (couponCodesPromise as CouponCode[]).sort((a, b) => a.email < b.email? -1 : 1)
         )
     )
     const [couponCodes, setCouponCodes] = useState(structuredClone(couponCodesInitial))
-    const [couponCodesNeedReset, setCouponCodesNeedReset] = useState(false)
+
 
     // Editor controls
     const [saveSuccess, setSaveSuccess] = useState(false)
     const [unsavedChanges, setUnsavedChanges] = useState(false)
+    const [filter, setFilter] = useState("")
+    const [errors, setErrors] = useState<Error[]>([])
     useEffect(() => {setUnsavedChanges(!isEqual(couponCodes, couponCodesInitial))}, [couponCodes, couponCodesInitial])
     const [_, saveAction, savePending] = useActionState(async () => {
         // Get codes that need changed
@@ -50,29 +55,32 @@ export default function PaginatedCouponCodes ({
         // Await all calls at the same time
         const responses = await Promise.all(responsesAwaitable)
 
+        let newCouponCodes = couponCodesInitial
+        // Selectively set errors or update coupon codes
+        for (const i in responses) {
+            if (responses[i].status !== 200) {
+                setErrors(prev => [...prev, new Error(responses[i].statusText)])
+            } else {
+                try {
+                    const resBody = (await responses[i].json()).data as CouponCode
+                    newCouponCodes = [...newCouponCodes.filter(c => c.email !== resBody.email), resBody]
+                } catch {
+                    setErrors(prev => [...prev, new Error("Unexpected API return value; refresh page to see changes!")])
+                }
+            }
+        }
+        newCouponCodes.sort((a, b) => a.email < b.email? -1 : 1)
+
+
         // Check for success
         setSaveSuccess(false)
         setSaveSuccess(responses.every(res => res.status === 200))
 
-        // Selectively set errors or update coupon codes
-        const newCouponCodes = couponCodesInitial
-        for (const i in responses) {
-            if (responses[i].status !== 200) {
-                // do set error
-            } else {
-                newCouponCodes
-            }
-        }
-
         // Reset coupon codes
-        setCouponCodesNeedReset(true)
         setCouponCodesInitial(newCouponCodes)
-        setCouponCodesNeedReset(false)
-
+        setCouponCodes(newCouponCodes)
 
     }, null)
-    const [filter, setFilter] = useState("")
-    const [editorError, setEditorError] = useState<string | null>(null)
 
 
     // Pagination controls
@@ -87,37 +95,38 @@ export default function PaginatedCouponCodes ({
     if (couponCodesPromise instanceof Error) {
         return (
             <div className="flex flex-col means-border">
-                <Error text={(couponCodesPromise as Error).message} hidden={!(couponCodesPromise instanceof Error)} />
+                <CustomError.default text={(couponCodesPromise as Error).message} hidden={!(couponCodesPromise instanceof Error)} />
             </div>
         )
     }
     return (
         <div className="flex flex-col means-border w-full text-xs md:text-sm">
-            <EditorControls
-                noSave={false} // for right now
-                savePending={savePending}
-                saveSuccess={saveSuccess}
-                unsavedChanges={unsavedChanges}
-                onSave={() => startTransition(saveAction)}
-                onResetChanges={() => setCouponCodes(structuredClone(couponCodesInitial))}
-                filter={filter}
-                filterPlaceholder="Filter by email..."
-                setFilter={setFilter}
-                error={editorError}
-            />
-            {couponCodes
-                .filter(c => c.email.toLowerCase().includes(filter.toLowerCase()))
-                .map((coupon, i) => {return (
-                    <CouponCodeComponent
-                        key={i}
-                        couponCode={coupon}
-                        couponCodeSetter={getItemSetter(setCouponCodes, i)}
-                        resetInitialCode={couponCodesNeedReset}
-                    />
-                )})
-                .slice((pageNumber - 1) * REPORTSPERPAGE, pageNumber * REPORTSPERPAGE)
-            }
-            <Controls currentPage={pageNumber} pageSetter={setPageNumber} numPages={numPages} />
+            <CouponCodesContext value={couponCodesInitial}>
+                <EditorControls
+                    noSave={false}
+                    savePending={savePending}
+                    saveSuccess={saveSuccess}
+                    unsavedChanges={unsavedChanges}
+                    onSave={() => startTransition(saveAction)}
+                    onResetChanges={() => setCouponCodes(structuredClone(couponCodesInitial))}
+                    filter={filter}
+                    filterPlaceholder="Filter by email..."
+                    setFilter={setFilter}
+                />
+                {couponCodes
+                    .filter(c => c.email.toLowerCase().includes(filter.toLowerCase()))
+                    .map((coupon, i) => {return (
+                        <CouponCodeComponent
+                            key={i}
+                            couponCode={coupon}
+                            couponCodeSetter={getItemSetter(setCouponCodes, i)}
+                        />
+                    )})
+                    .slice((pageNumber - 1) * REPORTSPERPAGE, pageNumber * REPORTSPERPAGE)
+                }
+                <Controls currentPage={pageNumber} pageSetter={setPageNumber} numPages={numPages} />
+                <MultiError errors={errors} setErrors={setErrors}/>
+            </CouponCodesContext>
         </div>
     )
 }

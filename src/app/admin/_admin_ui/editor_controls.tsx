@@ -13,7 +13,7 @@ export default function EditorControls({
     filter,
     filterPlaceholder,
     setFilter,
-    error
+    error=null
 }:{
     noSave: boolean,
     savePending: boolean,
@@ -24,7 +24,7 @@ export default function EditorControls({
     filter: string,
     filterPlaceholder: string,
     setFilter: Dispatch<SetStateAction<string>>,
-    error: string | null
+    error?: string | null
 }) {
 
     return (

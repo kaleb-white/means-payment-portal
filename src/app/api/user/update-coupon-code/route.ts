@@ -16,5 +16,5 @@ export async function POST(request: NextRequest) {
 
     if (serviceResponse instanceof Error) return new Response('', {status: 400, statusText: serviceResponse.message})
 
-    return new Response('', {status: 200, statusText: 'Coupon code updated succesfully'})
+    return new Response(JSON.stringify(parseResult), {status: 200, statusText: 'Coupon code updated succesfully'})
 }

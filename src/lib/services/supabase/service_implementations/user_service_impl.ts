@@ -133,6 +133,7 @@ export class SupabaseUserService  {
         const { data, error } = await supabase.from(tableName)
             .update({'coupon_code': couponCode})
             .eq('email', email)
+            .select()
 
         // If error, return it
         if (error) return error
