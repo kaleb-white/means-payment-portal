@@ -4,9 +4,9 @@ import CouponCodeComponent from "./coupon_code_component"
 import getItemSetter from "@/app/_client_utilities/get_item_setter"
 import * as CustomError from "@/app/_client_ui/error"
 import { CouponCode } from "@/lib/database/schemas"
-import { useEffect, useState, use, useActionState, startTransition, useRef, useContext, createContext } from "react"
+import { useEffect, useState, use, useActionState, startTransition, createContext } from "react"
 import { isEqual, difference } from 'lodash'
-import EditorControls from "./editor_controls"
+import EditorControls from "../editor_controls"
 import { apiRoutes } from "@/configs"
 import MultiError from "@/app/_client_ui/multi_error"
 

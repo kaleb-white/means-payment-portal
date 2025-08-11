@@ -2,7 +2,7 @@
 
 import { baseUrls } from "@/configs";
 import { usePathname } from "next/navigation";
-import Header from "../_client_ui/header";
+import Header from "../../_client_ui/header";
 import Link from "next/link";
 
 export default function AdminMenu() {

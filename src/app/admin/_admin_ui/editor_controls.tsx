@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from "react";
-import Error from "@/app/_client_ui/error";
+import CustomError from "@/app/_client_ui/error";
 import Button from "@/app/_client_ui/button";
 import { Spinner, Check } from "@/app/_client_ui/spinner";
 
@@ -38,7 +38,7 @@ export default function EditorControls({
                 <Button onClick={() => onResetChanges()} text="Reset Changes" />
                 <input className="means-input px-0" placeholder={filterPlaceholder} value={filter} onChange={(e) => setFilter(e.target.value)} />
             </div>
-            <Error text={error? error : ''} hidden={error? false : true} />
+            <CustomError text={error? error : ''} hidden={error? false : true} />
         </div>
     )
 }

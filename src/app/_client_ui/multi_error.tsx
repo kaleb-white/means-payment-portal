@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
-import Error from "./error";
+import CustomError from "./error";
 import { timers } from "@/configs";
 
 export default function MultiError({
@@ -26,7 +26,7 @@ export default function MultiError({
         {errors.length > 0 ?
             <div className="flex flex-col max-h-20 overflow-y-scroll">
                 {errors.map((error, i) => { return (
-                    <Error text={error.message} hidden={false} textsize={textsize} key={i}/>
+                    <CustomError text={error.message} hidden={false} textsize={textsize} key={i}/>
                 )})}
             </div>:
             <></>

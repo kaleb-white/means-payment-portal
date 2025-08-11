@@ -3,8 +3,8 @@ import { QuarterlyReport } from "@/lib/database/schemas"
 import clsx from "clsx"
 import { Dispatch, SetStateAction, RefObject, useState, useEffect, useActionState, startTransition, createContext } from "react"
 import * as l from "lodash";
-import { ReportDataRow } from "./report_data_row"
-import EditorControls from "./editor_controls"
+import EditorControls from "../editor_controls";
+import { ReportDataRow } from "./report_data_row";
 
 // A context allows the editable fields to edit the quarter without passing it all the way down
 // Equivalent to declaring a function

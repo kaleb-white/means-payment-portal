@@ -1,6 +1,6 @@
 'use client'
 
-import Error from "@/app/_client_ui/error";
+import CustomError from "@/app/_client_ui/error";
 import { Spinner } from "@/app/_client_ui/spinner";
 import { QuarterlyReport, Range } from "@/lib/database/schemas";
 import clsx from "clsx";
@@ -135,8 +135,8 @@ export default function PaginatedReports ({
     if (reports instanceof Error || reportsLength instanceof Error) {
         return (
             <div className="flex flex-col means-border">
-                <Error text={(reports as Error).message} hidden={!(reports instanceof Error)} />
-                <Error text={(reportsLength as Error).message} hidden={!(reportsLength instanceof Error)} />
+                <CustomError text={(reports as Error).message} hidden={!(reports instanceof Error)} />
+                <CustomError text={(reportsLength as Error).message} hidden={!(reportsLength instanceof Error)} />
             </div>
         )
     }
@@ -181,7 +181,7 @@ export default function PaginatedReports ({
             {/* Controls */}
             <Controls currentPage={pageNumber} pageSetter={setPageNumber} numPages={Math.ceil((reportsLength as number) / REPORTSPERPAGE)} />
             {/* Error */}
-            <Error text={error? error: ''} hidden={error? false: true} />
+            <CustomError text={error? error: ''} hidden={error? false: true} />
             {/* Spinner */}
             <div className="flex flex-col items-center">
                 {pending || deletePending? <Spinner /> : <></>}

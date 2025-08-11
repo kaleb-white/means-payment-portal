@@ -3,7 +3,7 @@ import { isValidFinancial } from "@/format_converter"
 import { QuarterlyReport, ReportDataRowUncast } from "@/lib/database/schemas"
 import clsx from "clsx"
 import { FocusEvent, RefObject, useContext, useState, useEffect, ChangeEvent } from "react"
-import Error from "@/app/_client_ui/error"
+import CustomError from "@/app/_client_ui/error"
 import { Quarters, QuarterSetter } from "./report_editor"
 
 // Helpers
@@ -36,7 +36,7 @@ function EditableReportDatapoint({ property, propertyValue, couponCode }: { prop
     // Get the context
     const context = useContext(QuarterSetter)
     if (!context) return (
-        <Error text={"Could not find context"} hidden={false} />
+        <CustomError text={"Could not find context"} hidden={false} />
     )
     const { changeQuarter } = context
 

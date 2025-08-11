@@ -6,7 +6,7 @@ import { signInSubmit, signUpSubmit } from "@/lib/services/login";
 import { useActionState, useEffect, useState } from "react";
 import clsx from "clsx";
 import { useSearchParams } from "next/navigation";
-import Error from "./_client_ui/error";
+import CustomError from "./_client_ui/error";
 
 function Errors({fieldHasText, errors} : {fieldHasText: boolean | undefined, errors: string[] | undefined}){
   return (
@@ -48,7 +48,7 @@ export default function Login() {
 
       <Image src="/meanstv_logo.png" alt="Means TV" width={662} height={100} className="p-6 mx-auto"/>
 
-      <Error
+      <CustomError
         text={`Encountered an error: ${error?.endsWith('.')? error.slice(0, -1) : error}.${extendedErrorMessage} If the issue persists, please contact means. Please sign in again.`}
         hidden={!error}
       />

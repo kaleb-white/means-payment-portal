@@ -1,23 +1,30 @@
 'use client'
 
-import { startTransition, useActionState, useEffect, useRef, useState } from "react"
+import { Dispatch, SetStateAction, startTransition, useActionState, useEffect, useRef, useState } from "react"
 import DropZone from "./drop_zone"
 import { Check, Spinner } from "@/app/_client_ui/spinner"
-import { fileTypes } from "@/configs"
-import { parseCsvAsQuarterlyReport } from "@/app/_client_utilities/parse_csv"
-import { isError } from "@/app/_client_utilities/type_checks"
+import { apiRoutes, fileTypes } from "@/configs"
+import { isCouponCode, isError, isQuarterlyReport } from "@/app/_client_utilities/type_checks"
 import clsx from "clsx"
-import { QuarterlyReport } from "@/lib/database/schemas"
 import MultiError from "@/app/_client_ui/multi_error"
-import { Quarter } from "./quarter"
 import getItemSetter from "@/app/_client_utilities/get_item_setter"
 import Button from "@/app/_client_ui/button"
+import { Quarter } from "./reports/quarter"
+import { CouponCode, QuarterlyReport } from "@/lib/database/schemas"
+import CustomError from "@/app/_client_ui/error"
+import CouponCodeComponent from "./coupon_codes/coupon_code_component"
 
-export function CreateReport() {
+export function CreateObjsFromFile<T>({
+    fileParser,
+    apiEndpoint
+}: {
+    fileParser: ((file: File) => Promise<T | Error>) | ((file: File) => Promise<T[] | Error>),
+    apiEndpoint: apiRoutes
+}) {
     // unproccesedFiles: haven't checked for duplicate data, parsed files, etc
     // csvFiles: processed files that are checked for duplication, etc
     const [unprocessedFiles, setUnprocessedFiles] = useState<Array<File>>([])
-    const [newReports, setNewReports] = useState<Array<QuarterlyReport>>([])
+    const [newObjs, setNewObjs] = useState<Array<T>>([])
 
     // Errors
     const [errors, setErrors] = useState<Array<Error>>([])
@@ -55,9 +62,11 @@ export function CreateReport() {
 
         // Process csv and error check
         unprocessedFiles.forEach(async file => {
-            const res = await parseCsvAsQuarterlyReport(file)
+            const res = await fileParser(file)
             if (isError(res)) {setErrors(prev => [...prev, new Error(res.message)]); return}
-            setNewReports(prev => [...prev, res])
+            Array.isArray(res) ?
+                setNewObjs(prev => prev.concat(res)) :
+                setNewObjs(prev => [...prev, res])
         })
 
         setUnprocessedFiles([])
@@ -73,15 +82,15 @@ export function CreateReport() {
     const [___, saveAction, savePending] = useActionState(
         async () => {
             const responses = []
-            // Post each report to the api
-            for (const report of newReports) {
-                const response = await fetch('api/analytics/create-quarterly-report', {
+            // Post each obj to the api
+            for (const obj of newObjs) {
+                const response = await fetch(apiEndpoint, {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(report)
+                    body: JSON.stringify(obj)
                 })
 
                 if (response.status === 500) {setErrors(prev => [...prev, new Error("An internal server error occured, my bad")]); return}
@@ -93,7 +102,7 @@ export function CreateReport() {
             setSuccess(responses.every(status => status === 200))
 
             // Reset reports
-            setNewReports([])
+            setNewObjs([])
         },
         null
     )
@@ -109,7 +118,7 @@ export function CreateReport() {
                 {pending? <Spinner /> : <></>}
                 <input
                     type="file" accept=".csv" multiple ref={inputRef}
-                    className="flex flex-row cursor-pointer text-center text-means-grey hover:text-means-grey-hover"
+                    className="block text-xs cursor-pointer text-center text-means-grey hover:text-means-grey-hover overflow-scroll"
                     onChange={(e) => {e.preventDefault(); startTransition(action)}}
                 />
             </div>
@@ -117,17 +126,25 @@ export function CreateReport() {
             {/* Errors */}
             <MultiError errors={errors} setErrors={setErrors} />
 
-            {/* Reports */}
-            {newReports.map((quarter, i) => { return (
-                <Quarter quarter={quarter} key={i} noPost={true} persistState={getItemSetter<QuarterlyReport>(setNewReports, i)}/>
-            )})}
+            {/* Objs */}
+            {newObjs.length === 0 ? <></> :
+            isQuarterlyReport(newObjs[0])?
+                newObjs.map((quarter, i) => { return (
+                    <Quarter quarter={quarter as QuarterlyReport} key={i} noPost={true} persistState={getItemSetter<QuarterlyReport>((setNewObjs as Dispatch<SetStateAction<QuarterlyReport[]>>), i)}/>
+                )}) :
+            isCouponCode(newObjs[0])?
+                newObjs.map((couponCode, i) => { return (
+                    <CouponCodeComponent key={i} couponCode={couponCode as CouponCode} couponCodeSetter={getItemSetter<CouponCode>(setNewObjs as Dispatch<SetStateAction<CouponCode[]>>, i)}/>
+                )}) :
+                <CustomError text="Please call this component with only a recognized object type." hidden={false} />
+            }
 
             {/* Controls */}
             <div className={clsx("flex flex-row place-content-center w-full p-1 md:p-2 gap-1 md:gap-2", {'means-border-top': errors.length > 0})}>
                 {savePending? <Spinner /> : <></>}
                 <Check success={success}/>
                 <Button text="Save Changes" onClick={() => startTransition(saveAction)} disabled={savePending} styles="w-full text-center" />
-                <Button text="Reset" onClick={() => setNewReports([])} />
+                <Button text="Reset" onClick={() => setNewObjs([])} />
             </div>
         </div>
     )

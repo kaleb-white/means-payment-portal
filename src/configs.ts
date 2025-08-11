@@ -35,5 +35,7 @@ export enum timers {
 }
 
 export enum apiRoutes {
-    updateCouponCode='api/user/update-coupon-code'
+    updateCouponCode='api/user/update-coupon-code',
+    createQuarterlyReport='api/analytics/create-quarterly-report',
+    createCouponCode='api/user/create-coupon-code'
 }
