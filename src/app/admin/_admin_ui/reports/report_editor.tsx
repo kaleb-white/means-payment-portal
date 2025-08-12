@@ -3,8 +3,8 @@ import { QuarterlyReport } from "@/lib/database/schemas"
 import clsx from "clsx"
 import { Dispatch, SetStateAction, RefObject, useState, useEffect, useActionState, startTransition, createContext } from "react"
 import * as l from "lodash";
-import { ReportDataRow } from "./report_data_row"
-import EditorControls from "./editor_controls"
+import EditorControls from "../editor_controls";
+import { ReportDataRow } from "./report_data_row";
 
 // A context allows the editable fields to edit the quarter without passing it all the way down
 // Equivalent to declaring a function
@@ -46,6 +46,7 @@ export function ReportEditor({
     }, [REPORTSPERPAGE, filter])
 
     // Save report
+    const [saveSuccess, setSaveSuccess] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [_, action, pending] = useActionState(
         async () => {
@@ -70,6 +71,10 @@ export function ReportEditor({
 
             // Reset error
             setError(null)
+
+            // Set success checkmark
+            setSaveSuccess(false)
+            setSaveSuccess(true)
         },
         null
     )
@@ -96,6 +101,7 @@ export function ReportEditor({
                         noSave={noPost}
                         savePending={pending}
                         unsavedChanges={unsavedChanges}
+                        saveSuccess={saveSuccess}
                         onSave={() => startTransition(action)}
                         onResetChanges={() => {changeQuarter(structuredClone(quarterInitial))}}
                         filter={filter}

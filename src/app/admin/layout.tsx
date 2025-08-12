@@ -1,5 +1,5 @@
 import NavbarServer from "../_client_ui/navbar_server"
-import AdminMenu from "./carousel"
+import AdminMenu from "./_admin_ui/carousel"
 
 export default function AdminLayout({children}:{children: React.ReactNode}) {
     return (

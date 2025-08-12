@@ -1,6 +1,6 @@
 'use client'
 
-import Error from "@/app/_client_ui/error";
+import CustomError from "@/app/_client_ui/error";
 import { Spinner } from "@/app/_client_ui/spinner";
 import { QuarterlyReport, Range } from "@/lib/database/schemas";
 import clsx from "clsx";
@@ -11,6 +11,7 @@ import Button from "@/app/_client_ui/button";
 import Image from 'next/image';
 import useRemoveError from "@/app/_custom_hooks/use_remove_error";
 import Modal from "@/app/_client_ui/modal";
+import OptionsModal from "@/app/_client_ui/options_modal";
 
 export default function PaginatedReports ({
     initialReports,
@@ -98,7 +99,6 @@ export default function PaginatedReports ({
     // Modal
     const [modalOpen, setModalOpen] = useState(false)
 
-
     // Delete reports
     const [reportToDelete, setReportToDelete] = useState<QuarterlyReport | null>(null)
     const [__, deleteReport, deletePending] = useActionState(async () => {
@@ -136,23 +136,23 @@ export default function PaginatedReports ({
     if (reports instanceof Error || reportsLength instanceof Error) {
         return (
             <div className="flex flex-col means-border">
-                <Error text={(reports as Error).message} hidden={!(reports instanceof Error)} />
-                <Error text={(reportsLength as Error).message} hidden={!(reportsLength instanceof Error)} />
+                <CustomError text={(reports as Error).message} hidden={!(reports instanceof Error)} />
+                <CustomError text={(reportsLength as Error).message} hidden={!(reportsLength instanceof Error)} />
             </div>
         )
     }
     return (
         <div className="flex flex-col means-border w-full">
             {/* Delete confirmation modal */}
-            <Modal isOpen={modalOpen} setIsOpen={setModalOpen}>
-                <div className="flex flex-col text-sm md:text-lg">
-                    <div>Are you sure you want to delete this report?</div>
-                    <div className="flex flex-row mt-1 md:mt-2 gap-2">
-                    <Button text={"Yes"} onClick={() => {setModalOpen(false); startTransition(deleteReport)}}/>
-                    <Button text={"No"} onClick={() => setModalOpen(false)} />
-                    </div>
-                </div>
-            </Modal>
+            <OptionsModal
+                isOpen={modalOpen}
+                setIsOpen={setModalOpen}
+                optionText="Are you sure you want to delete this report?"
+                buttons={[
+                    {text: 'Yes', callback: () => {setModalOpen(false); startTransition(deleteReport)}},
+                    {text: 'No', callback: () => setModalOpen(false)}
+                ]}
+            />
 
             {/* Reports */}
             <div className="flex flex-col md:relative">
@@ -182,11 +182,11 @@ export default function PaginatedReports ({
             {/* Controls */}
             <Controls currentPage={pageNumber} pageSetter={setPageNumber} numPages={Math.ceil((reportsLength as number) / REPORTSPERPAGE)} />
             {/* Error */}
-            <Error text={error? error: ''} hidden={error? false: true} />
+            <CustomError text={error? error: ''} hidden={error? false: true} />
             {/* Spinner */}
-            <div className="flex flex-col items-center">
-                {pending || deletePending? <Spinner /> : <></>}
-            </div>
+            {pending || deletePending?
+                <div className="flex place-items-center means-border-top"><Spinner /></div> : <></>
+            }
         </div>
     )
 }

@@ -34,7 +34,7 @@ export default function Controls({
     return (
         <div className="flex flex-row justify-between gap-1 m-1 md:m-2 rounded-b-1 text-xs md:text-sm text-means-grey ">
             {/* Back One */}
-            <div className="hover:text-means-grey-hover cursor-pointer" onClick={() => {pageSetter(Math.max(0, currentPage - 1))}}>◁</div>
+            <div className="hover:text-means-grey-hover cursor-pointer" onClick={() => {pageSetter(Math.max(1, currentPage - 1))}}>◁</div>
             {/* Go to Start */}
             {renderIfNotNull(
                 to1,

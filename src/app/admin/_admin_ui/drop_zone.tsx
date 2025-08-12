@@ -1,5 +1,5 @@
 import { Spinner } from "@/app/_client_ui/spinner"
-import Error from "@/app/_client_ui/error"
+import CustomError from "@/app/_client_ui/error"
 import clsx from "clsx"
 import { SetStateAction, Dispatch, DragEvent, useState, useActionState, startTransition } from "react"
 import useRemoveError from "@/app/_custom_hooks/use_remove_error"
@@ -68,7 +68,7 @@ export default function DropZone({
         >
             {pending? <Spinner />: <></>}
             {error?
-                <Error text={error} hidden={error? false: true} textsize="xs"/> :
+                <CustomError text={error} hidden={error? false: true} textsize="xs"/> :
                 <div>
                     Drag your csv here or click below to upload a new csv!
                 </div>

@@ -20,7 +20,9 @@ export enum graphConfig {
 
 export enum dbTableNames {
     testQuarterlyReports='test_quarterly_reports',
-    quarterlyReports='quarterly_reports'
+    quarterlyReports='quarterly_reports',
+    testCouponCodes='coupon_codes',
+    couponCodes='coupon_codes'
 }
 
 export enum fileTypes {
@@ -30,4 +32,11 @@ export enum fileTypes {
 export enum timers {
     errorTimeout=5000,
     nextErrorTimeout=500,
+}
+
+export enum apiRoutes {
+    updateCouponCode='api/user/update-coupon-code',
+    createQuarterlyReport='api/analytics/create-quarterly-report',
+    createCouponCode='api/user/create-coupon-code',
+    deleteCouponCode='api/user/delete-coupon-code'
 }

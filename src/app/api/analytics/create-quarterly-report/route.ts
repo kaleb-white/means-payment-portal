@@ -8,9 +8,7 @@ export async function POST(request: NextRequest) {
 
     const parseResult = QuarterlyReportSchema.safeParse(body)
 
-    if (parseResult.error) {
-        return new Response('', {status: 400, statusText: "Error while parsing body data"})
-    }
+    if (parseResult.error || !parseResult.data) return new Response('', {status: 400, statusText: "Error while parsing body data"})
 
     const dbContext = await DatabaseContext()
 

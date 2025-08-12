@@ -41,3 +41,8 @@ export const RangeSchema = z.object({
 })
 
 export const FileSchema = z.file().mime("text/csv")
+
+export const CouponCodeSchema = z.object({
+    email: z.email(),
+    couponCode: z.string()
+})
