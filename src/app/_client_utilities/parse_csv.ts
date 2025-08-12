@@ -100,7 +100,6 @@ export async function parseCsvAsCouponCode(file: File): Promise<CouponCode[] | E
     // Check emails for uniqueness
     const emailFreq: {[key: string]: number} = {}
     data.map(row => row.email).forEach((e) => emailFreq[e]? emailFreq[e] = emailFreq[e] + 1 : emailFreq[e] = 1)
-    console.log(emailFreq)
     const duplicates = Object.keys(emailFreq).map((e) => emailFreq[e] > 1? e : null).filter(e => e)
     if (duplicates.length > 0) return new Error(`Found duplicate email(s): ${duplicates.join(', ')}`)
 

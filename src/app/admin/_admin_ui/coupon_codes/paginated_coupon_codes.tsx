@@ -9,6 +9,11 @@ import { isEqual, difference } from 'lodash'
 import EditorControls from "../editor_controls"
 import { apiRoutes } from "@/configs"
 import MultiError from "@/app/_client_ui/multi_error"
+import Button from "@/app/_client_ui/button"
+import Image from 'next/image'
+import OptionsModal from "@/app/_client_ui/options_modal"
+import { Spinner } from "@/app/_client_ui/spinner"
+import clsx from "clsx"
 
 export const CouponCodesContext = createContext<CouponCode[]>([])
 
@@ -28,7 +33,6 @@ export default function PaginatedCouponCodes ({
         )
     )
     const [couponCodes, setCouponCodes] = useState(structuredClone(couponCodesInitial))
-
 
     // Editor controls
     const [saveSuccess, setSaveSuccess] = useState(false)
@@ -77,11 +81,44 @@ export default function PaginatedCouponCodes ({
         setSaveSuccess(responses.every(res => res.status === 200))
 
         // Reset coupon codes
-        setCouponCodesInitial(newCouponCodes)
+        setCouponCodesInitial(structuredClone(newCouponCodes))
         setCouponCodes(newCouponCodes)
 
     }, null)
 
+    // Delete controls
+    const [modalOpen, setModalOpen] = useState(false)
+    const [couponCodeToDelete, setCouponCodeToDelete] = useState<CouponCode | null>(null)
+    const [__, deleteCouponCode, deletePending] = useActionState(async () => {
+        if (!couponCodeToDelete) {setErrors(prev => [...prev, new Error("Delete action called with no coupon code defined")]); return}
+        const response = await fetch(apiRoutes.deleteCouponCode, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(couponCodeToDelete)
+        })
+
+        // Handle an error; display to user
+        if (response.status !== 200) {
+            setErrors(prev => [...prev, new Error(response.statusText)])
+            return
+        }
+
+        // Remove coupon code on success
+        setCouponCodes(couponCodes => {
+            return couponCodes.filter(c => !(c.email === couponCodeToDelete.email && c.couponCode === couponCodeToDelete.couponCode))
+        })
+
+        // Set initial
+        setCouponCodesInitial(couponCodes => {
+            return couponCodes.filter(c => !(c.email === couponCodeToDelete.email && c.couponCode === couponCodeToDelete.couponCode))
+        })
+
+        // Reset couponCodeToDelete
+        setCouponCodeToDelete(null)
+    }, null)
 
     // Pagination controls
     const [numPages, setNumPages] = useState(Math.ceil(couponCodes.length / REPORTSPERPAGE))
@@ -90,7 +127,7 @@ export default function PaginatedCouponCodes ({
         setNumPages(
             Math.ceil(couponCodes.filter(c => c.email.toLowerCase().includes(filter.toLowerCase())).length / REPORTSPERPAGE)
         )
-    }, [REPORTSPERPAGE, filter])
+    }, [REPORTSPERPAGE, filter, couponCodes])
 
     if (couponCodesPromise instanceof Error) {
         return (
@@ -101,6 +138,16 @@ export default function PaginatedCouponCodes ({
     }
     return (
         <div className="flex flex-col means-border w-full text-xs md:text-sm">
+            <OptionsModal
+                isOpen={modalOpen}
+                setIsOpen={setModalOpen}
+                optionText="Are you sure you want to delete this coupon code?"
+                buttons={[
+                    {text: 'Yes', callback: () => {setModalOpen(false); startTransition(deleteCouponCode)}},
+                    {text: 'No', callback: () => setModalOpen(false)}
+                ]}
+            />
+
             <CouponCodesContext value={couponCodesInitial}>
                 <EditorControls
                     noSave={false}
@@ -116,16 +163,30 @@ export default function PaginatedCouponCodes ({
                 {couponCodes
                     .filter(c => c.email.toLowerCase().includes(filter.toLowerCase()))
                     .map((coupon, i) => {return (
-                        <CouponCodeComponent
-                            key={i}
-                            couponCode={coupon}
-                            couponCodeSetter={getItemSetter(setCouponCodes, i)}
-                        />
+                        <div className="flex flex-row gap-0 items-center" key={i}>
+                            <div className={clsx("shrink-0 flex flex-col gap-1 justify-center items-center p-0.5 md:p-1 h-full", {
+                                'means-border-bottom': !couponCodesInitial.every(c => !(c.couponCode === coupon.couponCode && c.email === coupon.email)),
+                                'means-border-bottom-red': couponCodesInitial.every(c => !(c.couponCode === coupon.couponCode && c.email === coupon.email))
+                            })}>
+                                <Button
+                                    onClick={() => {setCouponCodeToDelete(coupon); setModalOpen(true)}}
+                                    text={<Image src="/trash.svg" alt="Delete Report" width={24} height={24}/>}
+                                    styles={"h-fit mx-auto means-border hover:bg-means-bg-hover cursor-pointer"}
+                                />
+                            </div>
+                            <div className="overflow-scroll no-scrollbar h-full">
+                                <CouponCodeComponent
+                                    couponCode={coupon}
+                                    couponCodeSetter={getItemSetter(setCouponCodes, i)}
+                                />
+                            </div>
+                        </div>
                     )})
                     .slice((pageNumber - 1) * REPORTSPERPAGE, pageNumber * REPORTSPERPAGE)
                 }
                 <Controls currentPage={pageNumber} pageSetter={setPageNumber} numPages={numPages} />
                 <MultiError errors={errors} setErrors={setErrors}/>
+                {deletePending? <div className="flex place-content-center means-border-top"><Spinner /></div> : <></>}
             </CouponCodesContext>
         </div>
     )

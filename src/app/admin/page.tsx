@@ -31,7 +31,7 @@ export default async function Analytics() {
             </div>
             <div className="flex flex-col w-fit max-w-full gap-2 md:max-w-1/5">
                 <Header text="Add New Coupon Codes" textSize="xl"/>
-                <CreateObjsFromFile<CouponCode> fileParser={parseCsvAsCouponCode} apiEndpoint={apiRoutes.createCouponCode}/>
+                <CreateObjsFromFile<CouponCode> fileParser={parseCsvAsCouponCode} apiEndpoint={apiRoutes.createCouponCode} allowNew={true}/>
             </div>
         </div>
     )

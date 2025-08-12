@@ -12,14 +12,23 @@ import Button from "@/app/_client_ui/button"
 import { Quarter } from "./reports/quarter"
 import { CouponCode, QuarterlyReport } from "@/lib/database/schemas"
 import CustomError from "@/app/_client_ui/error"
-import CouponCodeComponent from "./coupon_codes/coupon_code_component"
+import { CouponCodeEmailEditable } from "./coupon_codes/coupon_code_component"
 
+/**
+ *
+ * @param fileParser
+ * @param apiEndpoint
+ * @param allowNew
+ * @returns
+ */
 export function CreateObjsFromFile<T>({
     fileParser,
-    apiEndpoint
+    apiEndpoint,
+    allowNew=false
 }: {
     fileParser: ((file: File) => Promise<T | Error>) | ((file: File) => Promise<T[] | Error>),
-    apiEndpoint: apiRoutes
+    apiEndpoint: apiRoutes,
+    allowNew?: boolean
 }) {
     // unproccesedFiles: haven't checked for duplicate data, parsed files, etc
     // csvFiles: processed files that are checked for duplication, etc
@@ -118,7 +127,7 @@ export function CreateObjsFromFile<T>({
                 {pending? <Spinner /> : <></>}
                 <input
                     type="file" accept=".csv" multiple ref={inputRef}
-                    className="block text-xs cursor-pointer text-center text-means-grey hover:text-means-grey-hover overflow-scroll"
+                    className="block text-xs cursor-pointer text-center text-means-grey hover:text-means-grey-hover hover:bg-means-bg-hover overflow-scroll"
                     onChange={(e) => {e.preventDefault(); startTransition(action)}}
                 />
             </div>
@@ -134,9 +143,20 @@ export function CreateObjsFromFile<T>({
                 )}) :
             isCouponCode(newObjs[0])?
                 newObjs.map((couponCode, i) => { return (
-                    <CouponCodeComponent key={i} couponCode={couponCode as CouponCode} couponCodeSetter={getItemSetter<CouponCode>(setNewObjs as Dispatch<SetStateAction<CouponCode[]>>, i)}/>
+                    <CouponCodeEmailEditable key={i} couponCode={couponCode as CouponCode} couponCodeSetter={getItemSetter<CouponCode>(setNewObjs as Dispatch<SetStateAction<CouponCode[]>>, i)}/>
                 )}) :
                 <CustomError text="Please call this component with only a recognized object type." hidden={false} />
+            }
+
+            {/* Manual Creator */}
+            {!allowNew? <></> :
+            isCouponCode(apiEndpoint)?
+                <div className="means-border-bottom p-1 text-xs text-means-grey hover:text-means-grey-hover flex items-center bg-black hover:bg-means-bg-hover cursor-pointer"
+                    onClick={() => {setNewObjs(prev => [...prev, {email: "", couponCode: ""} as T])}}
+                >
+                    Add manually...
+                </div> :
+                <CustomError text="AllowNew is currently only configured for couponCodes; please set allowNew to false or change generic type to CouponCodes." hidden={false} />
             }
 
             {/* Controls */}

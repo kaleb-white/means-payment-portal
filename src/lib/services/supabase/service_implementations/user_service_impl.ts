@@ -97,9 +97,9 @@ export class SupabaseUserService  {
             supabase.from(tableName).select('email').eq('email', email),
             supabase.from(tableName).select('coupon_code').eq('coupon_code', couponCode)
         ])
-        if (matches[0].data && matches[0].data.length > 0) return new Error("A coupon exists with that email and coupon code")
-        if (matches[1].data && matches[1].data.length > 0) return new Error("A coupon exists with that email")
-        if (matches[2].data && matches[2].data.length > 0) return new Error("A coupon exists with that coupon code")
+        if (matches[0].data && matches[0].data.length > 0) return new Error(`A coupon exists with email ${email} and coupon code ${couponCode}`)
+        if (matches[1].data && matches[1].data.length > 0) return new Error(`A coupon exists with email ${email}`)
+        if (matches[2].data && matches[2].data.length > 0) return new Error(`A coupon exists with that coupon code ${couponCode}`)
 
         const { data, error } = await supabase.from(tableName)
             .insert([{email: email, coupon_code: couponCode}])
@@ -195,6 +195,9 @@ export class SupabaseUserService  {
             .eq('email', email)
             .eq('coupon_code', couponCode)
             .select()
+
+        console.log(JSON.stringify(error))
+        console.log(JSON.stringify(data))
 
         // If error, return it
         if (error) return error
